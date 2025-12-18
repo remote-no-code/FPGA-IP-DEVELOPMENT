@@ -51,56 +51,58 @@ Observed Output:
 
 This confirms:
 
-Correct compilation
+- Correct compilation  
+- Proper ELF loading via the Spike proxy kernel (`pk`)  
+- Successful execution on the RISC-V simulator  
 
-Proper ELF loading via the Spike proxy kernel (pk)
+---
 
-Successful execution on the RISC-V simulator
+## Modified Program Execution (Optional Confidence Task)
 
-4. Modified Program Execution (Optional Confidence Task)
+**Screenshot:** `riscv_sum_1_to_10.png`
 
-Screenshot: riscv_sum_1_to_10.png
+To validate workflow confidence, the source code was modified to calculate the sum from **1 to 10** instead of **1 to 9**. The program was recompiled and executed successfully using Spike.
 
-To validate workflow confidence, the source code was modified to calculate the sum from 1 to 10 instead of 1 to 9.
-The program was recompiled and executed successfully.
-
-Observed Output:
+**Observed Output:**
 `Sum from 1 to 10 is 55`
 
 
 This demonstrates the ability to:
+- Modify RISC-V C source code
+- Rebuild the program using the cross-compiler
+- Observe correct behavioral changes at runtime through simulation
 
-Modify RISC-V C code
+---
 
-Rebuild the program
+## VSDFPGA Firmware Build (No FPGA Hardware)
 
-Observe correct behavioral changes at runtime
+**Screenshot:** `vsdfpga_firmware_build.png`
 
-5. VSDFPGA Firmware Build (No FPGA Hardware)
-
-Screenshot: vsdfpga_firmware_build.png
-
-This screenshot confirms the successful execution of the VSDFPGA lab firmware build process:
-
+This screenshot confirms the successful execution of the VSDFPGA lab firmware build process using the following command:
+```bash
 make riscv_logo.bram.hex
+```
+The generation of `riscv_logo.bram.hex` verifies:
 
+- Multi-repository workflow readiness  
+- Correct integration of the RISC-V toolchain with the FPGA firmware build flow  
 
-The generation of riscv_logo.bram.hex verifies:
+FPGA flashing and physical hardware execution were intentionally skipped, as Task-1 does not require board-level validation.
 
-Multi-repository workflow readiness
+---
 
-Correct integration of the RISC-V toolchain with the FPGA firmware build flow
-
-FPGA flashing and hardware execution were intentionally skipped, as Task-1 does not require physical board usage.
-
-Summary of Verification
+## Summary of Verification
 
 The evidence provided in this repository confirms:
 
-Environment Setup: RISC-V toolchain and simulators are correctly installed and configured
+- **Environment Setup:**  
+  RISC-V toolchain and simulators are correctly installed and configured.
 
-Functional Simulation: Spike simulator successfully executes RISC-V binaries
+- **Functional Simulation:**  
+  Spike simulator successfully executes compiled RISC-V binaries.
 
-Workflow Validation: Programs can be modified, recompiled, and re-executed correctly
+- **Workflow Validation:**  
+  Programs can be modified, recompiled, and re-executed correctly.
 
-Firmware Generation: VSDFPGA firmware artifacts are built successfully without FPGA hardware
+- **Firmware Generation:**  
+  VSDFPGA firmware artifacts are built successfully without requiring FPGA hardware.
