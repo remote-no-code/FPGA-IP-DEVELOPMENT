@@ -23,11 +23,40 @@ All commands and builds were executed entirely inside the Codespace environment,
 - **Repository:** `vsd-riscv2`  
 - **Program Location:** `samples/`
 
+### RISC-V Reference Program Execution
+
+This section demonstrates the successful verification of the RISC-V toolchain and simulator by compiling and running a reference C program inside the GitHub Codespace environment.
+
+---
+
 ### Commands Used
 ```bash
-riscv64-unknown-elf-gcc --version  
-iverilog -V  
+riscv64-unknown-elf-gcc --version
+iverilog -V
 ```
+
+### Screenshot Evidence
+![RISC-V Toolchain Versions](toolchain_versions.png)  
+
+This screenshot confirms that the RISC-V cross-compiler and the Verilog simulator are correctly installed and available in the system PATH.
+
+## Spike Simulator Availability Check
+
+Since Spike does not support a --version flag, the help output is used to verify that the Spike ISA simulator is installed and responding correctly.
+
+--- 
+
+### Screenshot Evidence
+![Spike Help Output](spike_help.png)  
+
+This verifies that the Spike simulator is installed and responding correctly.
+
+
+## RISC-V Reference Program Compilation and Execution
+
+A simple RISC-V C program that computes the sum of integers from 1 to 9 was compiled and executed using Spike.
+
+### Commands Used
 ```bash
 riscv64-unknown-elf-gcc -o sum1ton.o sum1ton.c  
 spike pk sum1ton.o
@@ -36,11 +65,11 @@ spike pk sum1ton.o
 ```bash
 Sum from 1 to 9 is 45
 ```
+
 ### Screenshot Evidence
 
-![RISC-V Toolchain Versions](toolchain_versions.png)  
-![Spike Help Output](spike_help.png)  
 ![RISC-V Sum 1 to 9 Execution](riscv_sum_1_to_9.png)
+
 
 This confirms correct toolchain installation, successful compilation, ELF loading using Spike proxy kernel, and proper execution of the RISC-V program.
 
