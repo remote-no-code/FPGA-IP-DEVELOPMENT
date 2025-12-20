@@ -10,8 +10,9 @@ The objective of this task was to validate a known-good RISC-V reference flow an
 - **Platform:** GitHub Codespace
 - **OS:** Linux
 - **Execution Interface:** VS Code Terminal inside Codespace
+- **Additional Interface:** noVNC graphical terminal provided by Codespace
 
-All commands and builds were executed inside the Codespace environment as instructed.
+All commands and builds were executed inside the Codespace environment as instructed. No local FPGA hardware was used.
 
 ---
 
@@ -24,7 +25,7 @@ This screenshot verifies that the required tools are correctly installed and acc
 - **RISC-V Cross Compiler:** `riscv64-unknown-elf-gcc`
 - **Verilog Simulator:** `iverilog`
 
-This confirms that the base toolchain environment is correctly configured.
+This confirms that the base RISC-V development environment is correctly configured.
 
 ---
 
@@ -41,36 +42,33 @@ This verifies the availability of the RISC-V ISA simulator.
 ### 3. Initial RISC-V Program Execution  
 **Screenshot:** `riscv_sum_1_to_9.png`
 
-A simple **Sum 1 to N** RISC-V program was compiled and executed using the following flow:
-```bash
-riscv64-unknown-elf-gcc -o sum1ton.o sum1ton.c
-spike pk sum1ton.o
-```
-Observed Output:
-`Sum from 1 to 9 is 45`
+A simple **Sum from 1 to N** RISC-V program was compiled and executed using the following flow:
+
+riscv64-unknown-elf-gcc -o sum1ton.o sum1ton.c  
+spike pk sum1ton.o  
+
+Observed output:  
+Sum from 1 to 9 is 45
 
 This confirms:
-
-- Correct compilation  
-- Proper ELF loading via the Spike proxy kernel (`pk`)  
-- Successful execution on the RISC-V simulator  
+- Correct cross-compilation
+- Proper ELF loading using the Spike proxy kernel
+- Successful execution on the RISC-V simulator
 
 ---
 
-## Modified Program Execution (Optional Confidence Task)
-
+### 4. Modified Program Execution (Optional Confidence Task)  
 **Screenshot:** `riscv_sum_1_to_10.png`
 
-To validate workflow confidence, the source code was modified to calculate the sum from **1 to 10** instead of **1 to 9**. The program was recompiled and executed successfully using Spike.
+To further validate confidence with the toolchain, the source code was modified to compute the sum from **1 to 10** instead of **1 to 9**. The program was recompiled and executed using Spike.
 
-**Observed Output:**
-`Sum from 1 to 10 is 55`
-
+Observed output:  
+Sum from 1 to 10 is 55
 
 This demonstrates the ability to:
 - Modify RISC-V C source code
-- Rebuild the program using the cross-compiler
-- Observe correct behavioral changes at runtime through simulation
+- Rebuild using the cross-compiler
+- Observe correct behavioral changes through simulation
 
 ---
 
@@ -78,18 +76,61 @@ This demonstrates the ability to:
 
 **Screenshot:** `vsdfpga_firmware_build.png`
 
-This screenshot confirms the successful execution of the VSDFPGA lab firmware build process using the following command:
-```bash
-make riscv_logo.bram.hex
-```
-The generation of `riscv_logo.bram.hex` verifies:
+The VSDFPGA lab firmware was built successfully using the following command:
 
-- Multi-repository workflow readiness  
-- Correct integration of the RISC-V toolchain with the FPGA firmware build flow  
+make riscv_logo.bram.hex
+
+The build process generated the file `riscv_logo.bram.hex`, confirming:
+- Correct integration of the RISC-V toolchain
+- Readiness for SoC/FPGA firmware workflows
+- Successful multi-repository usage inside the same environment
 
 FPGA flashing and physical hardware execution were intentionally skipped, as Task-1 does not require board-level validation.
 
 ---
+
+## VSDFPGA RISC-V Logo Execution Using Spike (Simulator-Based)
+
+**Screenshot:** `spike_riscv_logo_output.png`
+
+In addition to firmware HEX generation, the VSDFPGA firmware source (`riscv_logo.c`) was compiled into an ELF and executed using the Spike simulator with proxy kernel support.
+
+The execution was performed using:
+
+riscv64-unknown-elf-gcc -o riscv_logo.o riscv_logo.c  
+spike pk riscv_logo.o  
+
+The screenshot shows the ASCII RISC-V logo being printed repeatedly, matching the banner defined inside `riscv_logo.c`:
+
+LEARN TO THINK LIKE A CHIP  
+VSDSQUADRON FPGA MINI  
+BRINGS RISC-V TO VSD CLASSROOM  
+
+In the screenshot:
+- The **left side** shows execution inside the **VS Code terminal** within GitHub Codespaces.
+- The **right side** shows the same output displayed through the **noVNC graphical terminal** provided by the Codespace environment.
+
+This confirms:
+- Correct firmware logic
+- Successful compilation of VSDFPGA firmware
+- Valid runtime behavior through simulation without FPGA hardware
+
+On actual FPGA hardware, the same firmware would display the ASCII logo over a UART connection using `make terminal`. Hardware execution is intentionally out of scope for Task-1.
+
+---
+
+## Summary of Verification
+
+The evidence in this repository confirms:
+- RISC-V toolchain installation and readiness
+- Spike simulator functionality
+- Successful compilation and execution of RISC-V programs
+- Ability to modify, rebuild, and validate program behavior
+- Successful VSDFPGA firmware build without FPGA hardware
+- Simulator-based validation of VSDFPGA firmware behavior
+
+This completes **Task-1: Environment Setup & RISC-V Reference Bring-Up**.
+
 
 ## Summary of Verification
 
