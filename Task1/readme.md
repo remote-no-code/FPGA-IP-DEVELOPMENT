@@ -47,7 +47,7 @@ This screenshot confirms that the RISC-V cross-compiler and the Verilog simulato
 Since Spike does not support a --version flag, the help output is used to verify that the Spike ISA simulator is installed and responding correctly.
 
 ### Screenshot Evidence
-![Spike Help Output](spike_help.png)  
+![Spike Help Output](snapshots/spike_help.png)  
 
 This verifies that the Spike simulator is installed and responding correctly.
 
@@ -68,7 +68,7 @@ Sum from 1 to 9 is 45
 
 ### Screenshot Evidence
 
-![RISC-V Sum 1 to 9 Execution](riscv_sum_1_to_9.png)
+![RISC-V Sum 1 to 9 Execution](snapshots/riscv_sum_1_to_9.png)
 
 
 This confirms correct toolchain installation, successful compilation, ELF loading using Spike proxy kernel, and proper execution of the RISC-V program.
@@ -90,7 +90,7 @@ Sum from 1 to 10 is 55
 ```
 ### Screenshot Evidence
 
-![RISC-V Sum 1 to 10 Execution](riscv_sum_1_to_10.png)
+![RISC-V Sum 1 to 10 Execution](snapshots/riscv_sum_1_to_10.png)
 
 This demonstrates the ability to modify source code, rebuild, and observe correct behavioral changes via simulation.
 
@@ -117,7 +117,7 @@ riscv_logo.bram.hex
 ```
 ### Screenshot Evidence
 
-![VSDFPGA Firmware Build](vsdfpga_firmware_build.png)
+![VSDFPGA Firmware Build](snapshots/vsdfpga_firmware_build.png)
 
 FPGA flashing and physical hardware execution were intentionally skipped, as Task-1 requires only build and simulation-level validation.
 
@@ -144,7 +144,7 @@ The firmware runs in an infinite loop and repeatedly prints the ASCII logo.
 
 ### Screenshot Evidence
 
-![VSDFPGA RISC-V Logo Execution](spike_riscv_logo_output.png)
+![VSDFPGA RISC-V Logo Execution](snapshots/spike_riscv_logo_output.png)
 
 In the screenshot:
 - The **left side** shows execution in the **VS Code terminal**
