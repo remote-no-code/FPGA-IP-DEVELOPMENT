@@ -39,6 +39,7 @@ iverilog -V
 ![RISC-V Toolchain Versions](toolchain_versions.png)  
 
 This screenshot confirms that the RISC-V cross-compiler and the Verilog simulator are correctly installed and available in the system PATH.
+
 ---
 
 ## Spike Simulator Availability Check
