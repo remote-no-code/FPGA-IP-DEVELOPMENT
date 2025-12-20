@@ -27,7 +27,8 @@ All commands and builds were executed entirely inside the Codespace environment,
 ```bash
 riscv64-unknown-elf-gcc --version  
 iverilog -V  
-
+```
+```bash
 riscv64-unknown-elf-gcc -o sum1ton.o sum1ton.c  
 spike pk sum1ton.o
 ```
