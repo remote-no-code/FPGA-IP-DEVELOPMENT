@@ -23,23 +23,53 @@ All commands and builds were executed entirely inside the Codespace environment,
 - **Repository:** `vsd-riscv2`  
 - **Program Location:** `samples/`
 
+### RISC-V Reference Program Execution
+
+This section demonstrates the successful verification of the RISC-V toolchain and simulator by compiling and running a reference C program inside the GitHub Codespace environment.
+
+---
+
 ### Commands Used
+```bash
+riscv64-unknown-elf-gcc --version
+iverilog -V
+```
 
-riscv64-unknown-elf-gcc --version  
-iverilog -V  
+### Screenshot Evidence
+![RISC-V Toolchain Versions](toolchain_versions.png)  
 
+This screenshot confirms that the RISC-V cross-compiler and the Verilog simulator are correctly installed and available in the system PATH.
+
+---
+
+## Spike Simulator Availability Check
+
+Since Spike does not support a --version flag, the help output is used to verify that the Spike ISA simulator is installed and responding correctly.
+
+### Screenshot Evidence
+![Spike Help Output](spike_help.png)  
+
+This verifies that the Spike simulator is installed and responding correctly.
+
+
+## RISC-V Reference Program Compilation and Execution
+
+A simple RISC-V C program that computes the sum of integers from 1 to 9 was compiled and executed using Spike.
+
+### Commands Used
+```bash
 riscv64-unknown-elf-gcc -o sum1ton.o sum1ton.c  
-spike pk sum1ton.o  
-
+spike pk sum1ton.o
+```
 ### Output Observed
-
+```bash
 Sum from 1 to 9 is 45
+```
 
 ### Screenshot Evidence
 
-![RISC-V Toolchain Versions](toolchain_versions.png)  
-![Spike Help Output](spike_help.png)  
 ![RISC-V Sum 1 to 9 Execution](riscv_sum_1_to_9.png)
+
 
 This confirms correct toolchain installation, successful compilation, ELF loading using Spike proxy kernel, and proper execution of the RISC-V program.
 
@@ -50,14 +80,14 @@ This confirms correct toolchain installation, successful compilation, ELF loadin
 The RISC-V program was modified to compute the sum from **1 to 10** instead of **1 to 9**, then rebuilt and re-executed.
 
 ### Commands Used
-
+```bash
 riscv64-unknown-elf-gcc -o sum1ton.o sum1ton.c  
 spike pk sum1ton.o  
-
+```
 ### Output Observed
-
+```bash
 Sum from 1 to 10 is 55
-
+```
 ### Screenshot Evidence
 
 ![RISC-V Sum 1 to 10 Execution](riscv_sum_1_to_10.png)
@@ -73,18 +103,18 @@ This demonstrates the ability to modify source code, rebuild, and observe correc
 - **Firmware Directory:** `basicRISCV/Firmware`
 
 ### Commands Used
-
+```bash
 git clone https://github.com/vsdip/vsdfpga_labs.git  
 cd vsdfpga_labs/basicRISCV/Firmware  
-
+```
 make riscv_logo.bram.hex  
 
 ### Result
 
 The firmware build completed successfully and generated the file:
-
+```bash
 riscv_logo.bram.hex
-
+```
 ### Screenshot Evidence
 
 ![VSDFPGA Firmware Build](vsdfpga_firmware_build.png)
@@ -99,15 +129,17 @@ In addition to HEX generation, the VSDFPGA firmware source (`riscv_logo.c`) was 
 
 ### Commands Used
 
+```bash
 riscv64-unknown-elf-gcc -o riscv_logo.o riscv_logo.c  
-spike pk riscv_logo.o  
+spike pk riscv_logo.o
+```
 
 ### Output Observed
-
+```bash
 LEARN TO THINK LIKE A CHIP  
 VSDSQUADRON FPGA MINI  
 BRINGS RISC-V TO VSD CLASSROOM  
-
+```
 The firmware runs in an infinite loop and repeatedly prints the ASCII logo.
 
 ### Screenshot Evidence
@@ -158,3 +190,16 @@ The evidence provided in this repository confirms:
   VSDFPGA firmware behavior was validated through simulator-based execution using Spike, confirming correct ASCII logo generation without FPGA hardware.
 
 This completes **Task-1: Environment Setup & RISC-V Reference Bring-Up**.
+
+## Reference Repositories
+
+The following GitHub repositories were used as official references for completing Task-1:
+
+- **vsd-riscv2**  
+  https://github.com/vsdip/vsd-riscv2  
+  Used for setting up the RISC-V toolchain, running the reference RISC-V programs, and validating execution using the Spike simulator.
+
+- **vsdfpga_labs**  
+  https://github.com/vsdip/vsdfpga_labs  
+  Used for building the VSDFPGA basic RISC-V firmware and generating the `riscv_logo.bram.hex` file as part of the firmware build flow.
+
