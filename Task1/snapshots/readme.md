@@ -39,12 +39,11 @@ iverilog -V
 ![RISC-V Toolchain Versions](toolchain_versions.png)  
 
 This screenshot confirms that the RISC-V cross-compiler and the Verilog simulator are correctly installed and available in the system PATH.
+---
 
 ## Spike Simulator Availability Check
 
 Since Spike does not support a --version flag, the help output is used to verify that the Spike ISA simulator is installed and responding correctly.
-
---- 
 
 ### Screenshot Evidence
 ![Spike Help Output](spike_help.png)  
@@ -190,3 +189,16 @@ The evidence provided in this repository confirms:
   VSDFPGA firmware behavior was validated through simulator-based execution using Spike, confirming correct ASCII logo generation without FPGA hardware.
 
 This completes **Task-1: Environment Setup & RISC-V Reference Bring-Up**.
+
+## Reference Repositories
+
+The following GitHub repositories were used as official references for completing Task-1:
+
+- **vsd-riscv2**  
+  https://github.com/vsdip/vsd-riscv2  
+  Used for setting up the RISC-V toolchain, running the reference RISC-V programs, and validating execution using the Spike simulator.
+
+- **vsdfpga_labs**  
+  https://github.com/vsdip/vsdfpga_labs  
+  Used for building the VSDFPGA basic RISC-V firmware and generating the `riscv_logo.bram.hex` file as part of the firmware build flow.
+
