@@ -46,6 +46,11 @@ This screenshot confirms that the RISC-V cross-compiler and the Verilog simulato
 
 Since Spike does not support a --version flag, the help output is used to verify that the Spike ISA simulator is installed and responding correctly.
 
+### Commands Used
+```bash
+spike --help
+```
+
 ### Screenshot Evidence
 ![Spike Help Output](snapshots/spike_help.png)  
 
