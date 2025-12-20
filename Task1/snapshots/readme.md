@@ -24,17 +24,17 @@ All commands and builds were executed entirely inside the Codespace environment,
 - **Program Location:** `samples/`
 
 ### Commands Used
-
+```bash
 riscv64-unknown-elf-gcc --version  
 iverilog -V  
 
 riscv64-unknown-elf-gcc -o sum1ton.o sum1ton.c  
-spike pk sum1ton.o  
-
+spike pk sum1ton.o
+```
 ### Output Observed
-
+```bash
 Sum from 1 to 9 is 45
-
+```
 ### Screenshot Evidence
 
 ![RISC-V Toolchain Versions](toolchain_versions.png)  
@@ -50,14 +50,14 @@ This confirms correct toolchain installation, successful compilation, ELF loadin
 The RISC-V program was modified to compute the sum from **1 to 10** instead of **1 to 9**, then rebuilt and re-executed.
 
 ### Commands Used
-
+```bash
 riscv64-unknown-elf-gcc -o sum1ton.o sum1ton.c  
 spike pk sum1ton.o  
-
+```
 ### Output Observed
-
+```bash
 Sum from 1 to 10 is 55
-
+```
 ### Screenshot Evidence
 
 ![RISC-V Sum 1 to 10 Execution](riscv_sum_1_to_10.png)
@@ -73,18 +73,18 @@ This demonstrates the ability to modify source code, rebuild, and observe correc
 - **Firmware Directory:** `basicRISCV/Firmware`
 
 ### Commands Used
-
+```bash
 git clone https://github.com/vsdip/vsdfpga_labs.git  
 cd vsdfpga_labs/basicRISCV/Firmware  
-
+```
 make riscv_logo.bram.hex  
 
 ### Result
 
 The firmware build completed successfully and generated the file:
-
+```bash
 riscv_logo.bram.hex
-
+```
 ### Screenshot Evidence
 
 ![VSDFPGA Firmware Build](vsdfpga_firmware_build.png)
@@ -99,15 +99,17 @@ In addition to HEX generation, the VSDFPGA firmware source (`riscv_logo.c`) was 
 
 ### Commands Used
 
+```bash
 riscv64-unknown-elf-gcc -o riscv_logo.o riscv_logo.c  
-spike pk riscv_logo.o  
+spike pk riscv_logo.o
+```
 
 ### Output Observed
-
+```bash
 LEARN TO THINK LIKE A CHIP  
 VSDSQUADRON FPGA MINI  
 BRINGS RISC-V TO VSD CLASSROOM  
-
+```
 The firmware runs in an infinite loop and repeatedly prints the ASCII logo.
 
 ### Screenshot Evidence
