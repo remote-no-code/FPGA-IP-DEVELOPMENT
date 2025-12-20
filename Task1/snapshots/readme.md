@@ -119,17 +119,6 @@ On actual FPGA hardware, the same firmware would display the ASCII logo over a U
 
 ---
 
-## Summary of Verification
-
-The evidence in this repository confirms:
-- RISC-V toolchain installation and readiness
-- Spike simulator functionality
-- Successful compilation and execution of RISC-V programs
-- Ability to modify, rebuild, and validate program behavior
-- Successful VSDFPGA firmware build without FPGA hardware
-- Simulator-based validation of VSDFPGA firmware behavior
-
-This completes **Task-1: Environment Setup & RISC-V Reference Bring-Up**.
 
 
 ## Summary of Verification
@@ -147,3 +136,7 @@ The evidence provided in this repository confirms:
 
 - **Firmware Generation:**  
   VSDFPGA firmware artifacts are built successfully without requiring FPGA hardware.
+
+- **Firmware Execution Validation:**  
+  VSDFPGA firmware behavior was validated through simulator-based execution using Spike, confirming correct ASCII logo generation without requiring FPGA hardware.
+
