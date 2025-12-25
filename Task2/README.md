@@ -655,6 +655,42 @@ The goals of this step are:
   - Waveform inspection (GTKWave)[2][1]
 
 ***
+UART Stub (Simulation-Only)
+
+Before running the simulation, the UART in the SoC is replaced with a lightweight simulation-only module called uart_stub.v.
+Why Use a UART Stub?
+
+During simulation we compile with -DBENCH, which activates:
+
+    uart_stub.v → prints characters to console
+    instead of
+
+    emitter_uart.v → real serial UART output
+
+This allows the program output (e.g. GPIO readback) to be seen directly in the terminal during simulation without needing to decode serial timing.
+How It Works
+
+The UART stub is conditionally compiled:
+
+verilog
+`ifdef BENCH
+    // Simulation: use simple character printing
+    uart_stub UART (...);
+`else
+    // Real hardware: use actual UART
+    corescore_emitter_uart UART (...);
+`endif
+
+Benefits:
+
+    Instant text output in simulation
+
+    No serial protocol overhead
+
+    Faster simulation
+
+    Easier debugging
+
 
 ## Files Used in Step 4
 
