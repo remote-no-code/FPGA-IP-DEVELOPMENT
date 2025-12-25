@@ -1008,7 +1008,7 @@ The memory-mapped GPIO IP was successfully validated on real FPGA hardware. Hard
 ![Flash Log](snapshots/flash_log.png)
 *FPGA bitstream was successfully programmed and verified on the VSDSquadron FPGA Mini.*
 
-![LED Validation](snapshots/board_led.jpg)
+![LED Validation](snapshots/board_led.jpeg)
 *Onboard RGB user LED illuminated during execution, confirming successful GPIO output control on hardware.*
 
 
