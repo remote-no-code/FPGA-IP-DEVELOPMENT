@@ -900,6 +900,8 @@ Before proceeding with hardware validation, the following conditions must be ver
 ## Pin Mapping
 
 The GPIO output connects to the onboard RGB LED through the SoC's LEDS port.
+*Since the design uses the internal HFOSC for clock generation, the external `CLK` pin constraint was removed/commented out in the PCF file.*
+
 
 ### LED Pin Assignment
 
