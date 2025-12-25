@@ -871,4 +871,147 @@ At this point:
 👉 **Step 5 is optional and only for those with hardware**
 
 ---
+# Step 5: Hardware Validation (Optional)
 
+## Overview
+
+This step validates the memory-mapped GPIO Output IP on real FPGA hardware, ensuring that simulation behavior matches physical silicon implementation. This optional validation step provides additional confidence in SoC integration correctness.
+
+## Hardware Platform
+
+### Target Board Specifications
+
+- **Board**: VSDSquadron FPGA Mini (FM)
+- **FPGA**: Lattice ICE40UP5K (SG48 package)
+- **Clock Source**: Internal HFOSC (12 MHz)
+- **Toolchain**: Yosys, nextpnr-ice40, IceStorm
+- **Programmer**: iceprog (via onboard FTDI)
+
+## Prerequisites
+
+Before proceeding with hardware validation, the following conditions must be verified:
+
+- RISC-V SoC successfully passes simulation
+- GPIO IP contains one 32-bit register with write and readback support
+- GPIO IP is memory-mapped in the IO region
+- GPIO IP is integrated into SoC top-level
+- UART output is verified in simulation
+- No RTL changes are required specifically for hardware validation
+
+## Pin Mapping
+
+The GPIO output connects to the onboard RGB LED through the SoC's LEDS port.
+
+### LED Pin Assignment
+
+| GPIO Bit | LED Color | FPGA Pin |
+|----------|-----------|----------|
+| GPIO  | Red       | Pin 39   |
+| GPIO  | Blue      | Pin 40   |
+| GPIO  | Green     | Pin 41   |
+
+These mappings are specified in the constraint file `VSDSquadronFM.pcf` and used during place-and-route.
+
+## Build Process
+
+### Synthesis and Implementation
+
+Execute the complete build flow:
+
+```bash
+make clean
+make build
+```
+
+This performs:
+
+- RTL synthesis using Yosys
+- Placement and routing using nextpnr-ice40
+- Timing analysis
+- Bitstream generation (`SOC.bin`)
+
+The design meets timing at 12 MHz with sufficient margin.
+
+### FPGA Programming
+
+Program the generated bitstream onto the FPGA:
+
+```bash
+sudo make flash
+```
+
+### Programming Verification
+
+Successful programming confirms:
+
+- External SPI flash detected correctly
+- Bitstream programmed successfully
+- Flash verification passed (VERIFY OK)
+- FPGA configuration completed (CDONE = high)
+
+## Software Validation
+
+The same C test program used in simulation is reused for hardware validation.
+
+### GPIO Test Program Behavior
+
+The test program:
+
+- Writes specific values to the GPIO register
+- Reads back the register value
+- Prints results via UART
+
+### Example GPIO Write Values
+
+| Value  | Expected LED State |
+|--------|-------------------|
+| `0x1`  | Red LED ON        |
+| `0x2`  | Blue LED ON       |
+| `0x4`  | Green LED ON      |
+| `0x0`  | All LEDs OFF      |
+
+## Validation Results
+
+### LED Behavior
+
+Writing values to the GPIO register correctly controls the onboard RGB LED:
+
+- Each GPIO bit maps to the expected LED color
+- Writing `0x0` turns all LEDs OFF
+- Individual and combined LED control works as expected
+
+### UART Output
+
+UART output matches expected readback values, confirming:
+
+- Correct CPU access to the GPIO register
+- Correct readback behavior
+- Correct memory-mapped integration
+- Proper CPU-to-peripheral interaction
+
+## Conclusion
+
+The memory-mapped GPIO IP was successfully validated on real FPGA hardware. Hardware behavior matches simulation results exactly, confirming:
+
+- ✅ Correct GPIO IP functionality
+- ✅ Correct address decoding
+- ✅ Correct SoC integration
+- ✅ Correct CPU-to-peripheral interaction
+
+**Status**: Step 5 (Hardware Validation) completed successfully.
+
+### Hardware Validation Evidence
+
+![Build Log](snapshots/build_log.png)
+*RISC-V SoC synthesized, placed, and routed successfully with timing closure achieved at 12 MHz.*
+
+![Flash Log](snapshots/flash_log.png)
+*FPGA bitstream was successfully programmed and verified on the VSDSquadron FPGA Mini.*
+
+![LED Validation](snapshots/board_led.jpg)
+*Onboard RGB user LED illuminated during execution, confirming successful GPIO output control on hardware.*
+
+
+***
+
+*This completes the optional hardware validation phase of the RISC-V SoC development process.*
