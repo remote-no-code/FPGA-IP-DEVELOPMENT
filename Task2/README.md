@@ -12,7 +12,7 @@ The work is divided into **mandatory steps (1–4)** and an **optional hardware 
 - [Step 2 – Write the GPIO IP RTL (Mandatory)](#step-2--write-the-gpio-ip-rtl-mandatory)
 - [Step 3 – Integrate the GPIO IP into the SoC (Mandatory)](#step-3--integrate-the-gpio-ip-into-the-soc-mandatory)
 - [Step 4 – Validate Using Simulation (Mandatory)](#step-4--validate-using-simulation-mandatory)
-- [Step 5 – Hardware Validation (Optional)](#step-5--hardware-validation-optional)
+- [Step 5 – Hardware Validation (Optional)](#step-5-hardware-validation-optional)
 
 ***
 
