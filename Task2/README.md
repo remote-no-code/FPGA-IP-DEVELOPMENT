@@ -13,7 +13,6 @@ The work is divided into **mandatory steps (1–4)** and an **optional hardware 
 - [Step 3 – Integrate the GPIO IP into the SoC (Mandatory)](#step-3--integrate-the-gpio-ip-into-the-soc-mandatory)
 - [Step 4 – Validate Using Simulation (Mandatory)](#step-4--validate-using-simulation-mandatory)
 - [Step 5 – Hardware Validation (Optional)](#step-5--hardware-validation-optional)
-- [Submission Summary](#submission-summary)
 
 ***
 
@@ -1000,7 +999,7 @@ The memory-mapped GPIO IP was successfully validated on real FPGA hardware. Hard
 
 **Status**: Step 5 (Hardware Validation) completed successfully.
 
-### Hardware Validation Evidence
+### Hardware Validation 
 
 ![Build Log](snapshots/build_log.png)
 *RISC-V SoC synthesized, placed, and routed successfully with timing closure achieved at 12 MHz.*
