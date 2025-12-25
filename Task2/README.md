@@ -649,15 +649,18 @@ The goals of this step are:
 
 - Confirm that the CPU can **write** to the GPIO register
 - Confirm that the CPU can **read back** the same value
-- Confirm that GPIO behaves like a **proper memory-mapped register**[5][6]
+- Confirm that GPIO behaves like a **proper memory-mapped register**
 - Verify system behavior using:
-  - UART output[7][8]
-  - Waveform inspection (GTKWave)[2][1]
+  - UART output
+  - Waveform inspection (GTKWave)
 
 ***
+
 UART Stub (Simulation-Only)
 
 Before running the simulation, the UART in the SoC is replaced with a lightweight simulation-only module called uart_stub.v.
+
+​
 Why Use a UART Stub?
 
 During simulation we compile with -DBENCH, which activates:
@@ -668,6 +671,8 @@ During simulation we compile with -DBENCH, which activates:
     emitter_uart.v → real serial UART output
 
 This allows the program output (e.g. GPIO readback) to be seen directly in the terminal during simulation without needing to decode serial timing.
+
+​
 How It Works
 
 The UART stub is conditionally compiled:
@@ -685,12 +690,13 @@ Benefits:
 
     Instant text output in simulation
 
-    No serial protocol overhead
+​
 
-    Faster simulation
+No serial protocol overhead
 
-    Easier debugging
+Faster simulation
 
+Easier debugging
 
 ## Files Used in Step 4
 
