@@ -56,9 +56,9 @@ Use the links below to navigate through each step of Task-3 :
 
 - [**Step 1: Study and Plan (Mandatory)**](#step-1-study-and-plan-mandatory)
 - [**Step 2: Implement Multi-Register GPIO RTL (Mandatory)**](#step-2-implement-multi-register-gpio-rtl-mandatory)
-- [**Step 3: Integrate the GPIO IP into the SoC (Mandatory)**](#step-3-integrate-the-gpio-ip-into-the-soc-mandatory)
-- [**Step 4: Software Validation using RISC-V Firmware (Mandatory)**](#step-4-software-validation-using-risc-v-firmware-mandatory)
-- [**Step 5: Hardware Validation on FPGA (Optional)**](#step-5-hardware-validation-on-fpga-optional)
+- [**Step 3: Integrate the Multi Register GPIO IP into the SoC (Mandatory)**](#step-3-integrate-the-multi-register-gpio-ip-into-the-soc-mandatory)
+- [**Step 4: Software Validation (Mandatory)**](#step-4-software-validation-mandatory)
+- [**Step 5: Hardware Validation (Optional)**](#step-5-hardware-validation-optional)
 
 ***
 
@@ -459,7 +459,7 @@ This step is strictly RTL IP implementation .
 
 ### Evidence to Include for Step 2
 
-📸 **Screenshots to include in the README**
+![GPIO Control IP RTL](snapshots/gpio_ctrl_ip.png)
 
 `gpio_ctrl_ip.v` showing:
 - Register declarations
@@ -482,7 +482,7 @@ At the end of Step 2:
 
 This step transforms the GPIO from a simple block into a realistic peripheral .
 
-## Step 3: Integrate the Multi-Register GPIO IP into the SoC (Mandatory)
+## Step 3: Integrate the Multi Register GPIO IP into the SoC (Mandatory)
 
 ### Purpose of This Step
 
@@ -698,7 +698,7 @@ This step is strictly SoC-level integration .
 
 ### Evidence to Include for Step 3
 
-📸 **Screenshots to include in README** 
+![GPIO Integration in SoC](snapshots/gpio_integration.png)
 
 SOC module showing:
 - GPIO base address definition
@@ -821,11 +821,6 @@ This ensures:
 - No outdated firmware is accidentally used
 - The generated HEX matches the current C code
 
-📸 **Screenshot to include**
-- Clean command execution
-
-***
-
 ## Step 4.3: Compiling the Firmware (ELF Generation)
 
 The firmware is compiled and linked for execution from BRAM .
@@ -843,10 +838,6 @@ This step performs:
 **Output File**
 - `gpio_test.bram.elf`
 
-📸 **Screenshot to include**
-- Successful ELF generation output
-
-***
 
 ## Step 4.4: Generating the BRAM HEX File (CRITICAL)
 
@@ -873,7 +864,8 @@ Internally, this runs a tool similar to:
 **Output File**
 - `gpio_test.bram.hex`
 
-📸 **Screenshot to include**
+![Firmware HEX Generation](snapshots/firmware_hex_output.png)
+
 - Terminal output showing HEX generation
 
 ***
@@ -938,7 +930,8 @@ This confirms:
 - Correct write handling
 - Correct register updates
 
-📸 **Screenshots to include**
+![Simulation Output](snapshots/terminal_output.png)
+
 - Terminal output showing GPIO write logs
 - Optional waveform screenshot
 
@@ -972,7 +965,7 @@ By the end of this step:
 
 This step completes functional validation of the GPIO IP .
 
-````markdown
+
 ## Step 5: Hardware Validation (Optional)
 
 ### Purpose of This Step
@@ -1051,7 +1044,7 @@ This command performs the full FPGA flow:
 * No synthesis or P&R errors
 * `SOC.bin` file generated successfully
 
-📸 **Screenshot to include**
+![FPGA Build Output](snapshots/make_build.png)
 
 * Terminal output showing successful completion of `make build`
 
@@ -1081,10 +1074,6 @@ lsmod | grep ftdi
 
 This confirms the system can communicate with the board.
 
-📸 **Screenshot to include**
-
-* `lsusb` output showing the FTDI device
-
 ---
 
 ## Step 5.3: Flashing the Bitstream to the FPGA
@@ -1112,7 +1101,7 @@ This confirms:
 * Bitstream is written correctly
 * FPGA configuration is successful
 
-📸 **Screenshot to include**
+![FPGA Flash Output](snapshots/flash_terminal.png)
 
 * Terminal output showing successful `iceprog`
 
@@ -1150,22 +1139,11 @@ This confirms:
 * Output data is correctly driven
 * Software-to-hardware path is functional
 
-📸 **Evidence to include**
-
-* Clear photo of the FPGA board showing LED states
-* Optional short video demonstrating LED changes
-
 ---
 
 ## Step 5.6: Optional UART Output Validation
 
 If UART output is enabled in the firmware:
-
-List serial devices:
-
-```bash
-ls /dev/ttyUSB*
-```
 
 Open serial terminal:
 
@@ -1173,13 +1151,7 @@ Open serial terminal:
 picocom -b 9600 /dev/ttyUSBx
 ```
 
-(Replace `x` with the correct device number.)
-
 If the firmware prints messages, they should appear in the terminal, confirming UART and CPU execution on hardware.
-
-📸 **Optional screenshot**
-
-* UART output visible in terminal
 
 ---
 
