@@ -1199,6 +1199,3 @@ Although optional, completing this step provides strong evidence of:
 * Industry-relevant validation workflow
 
 This concludes Task-3 successfully.
-
-```
-```
