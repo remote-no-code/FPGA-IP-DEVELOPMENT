@@ -43,13 +43,7 @@ Simulation-level validation was completed. FPGA hardware validation will be perf
 - ✅ RISC-V toolchain verified  
 - ✅ Simulator-based execution validated  
 - ✅ VSDFPGA firmware build working  
-- ✅ Memory-mapped GPIO IP integrated  
-
----
-Here is a **concise, complete Task-3 section** written in the **same tone and structure** as Task-1 and Task-2.
-You can paste this **directly below Task-2** in your README.
-
----
+- ✅ Memory-mapped GPIO IP integrated
 
 ## Task-3: Multi-Register GPIO IP with Software Control
 
