@@ -779,77 +779,77 @@ At the end of Step 3:
 
 This step completes the hardware-side plumbing required for end-to-end validation.
 
-# Step 4: Software Validation (Mandatory)
+---
 
-## Purpose of This Step
+## Step 4: Software Validation (Mandatory)
 
-In Step 4, I validated the **entire GPIO IP using software**, proving that the hardware behaves correctly when accessed by a real program running on the RISC-V processor.
+### Purpose of This Step
+
+The purpose of Step 4 is to **validate the multi-register GPIO IP through real software execution** on the RISC-V processor.
+This step proves that the GPIO hardware behaves correctly when accessed using **memory-mapped I/O** by a C program, not just in isolation at the RTL level.
 
 Up to Step 3:
 
-* The GPIO IP is correctly designed
-* It is properly integrated into the SoC
-* Address decoding is verified at the RTL level
+* The GPIO IP was correctly designed
+* It was integrated into the SoC
+* Address decoding was verified at the RTL level
 
-However, none of this is meaningful unless **software can reliably control the GPIO peripheral**.
-
-This step establishes the complete:
+However, a peripheral is only correct if **software can use it reliably**.
+This step establishes and validates the complete flow:
 
 ```
-Software → Bus → GPIO IP → Register → Hardware Signal
+C Software → CPU → Bus → GPIO IP → Registers → Signals
 ```
 
-flow and confirms that the **register-level contract defined in Step 1 is honored in practice**.
-
-✅ **Simulation-based validation is mandatory** for this step.
+Simulation-based validation is **mandatory** for this task.
 
 ---
 
-## What Is Being Validated
+### What Is Being Validated
 
-Using real firmware execution, the following behaviors are validated:
+Using software execution, the following behaviors are verified:
 
-* GPIO direction control works (`GPIO_DIR`)
-* GPIO output values update correctly (`GPIO_DATA`)
-* GPIO readback reflects correct pin state (`GPIO_READ`)
-* Address offsets decode correctly
-* Write and read timing is correct
-* UART output confirms firmware execution flow
-* Internal signals match expected behavior (via GTKWave)
+* GPIO direction control using `GPIO_DIR`
+* GPIO output updates using `GPIO_DATA`
+* GPIO readback behavior using `GPIO_READ`
+* Correct address offset decoding
+* Correct timing and ordering of read/write transactions
+* Proper execution flow confirmed via UART and simulation logs
+* Signal-level correctness using GTKWave
 
 ---
 
-## Files Used in This Step
+### Files Used in This Step
 
-### Firmware Side
+#### Firmware Side
 
-* `Firmware/gpio_test.c` – main test program
+* `Firmware/gpio_test.c` – GPIO test application
 * `Firmware/start.S` – startup code
 * `Firmware/print.c` – UART print support
 * `Firmware/bram.ld` – linker script
 
-### RTL Side
+#### RTL Side
 
 * `RTL/riscv.v`
-* `RTL/firmware.hex` (generated in this step)
+* `RTL/firmware.hex` (generated during this step)
 
- **No RTL logic was modified during Step 4**
+No RTL logic was modified during Step 4.
 
 ---
 
 ## Step 4.1: Writing the GPIO Test Program
 
-A C test program was written to explicitly exercise **all GPIO registers** from software.
+A C program was written to explicitly exercise all GPIO registers and validate their behavior from software.
 
 ### Key Actions Performed by the Firmware
 
-* Define GPIO base address
+* Define the GPIO base address
 * Configure GPIO direction using `GPIO_DIR`
-* Drive a known output pattern using `GPIO_DATA`
-* Read back pin state using `GPIO_READ`
+* Write a known pattern to `GPIO_DATA`
+* Read back GPIO state using `GPIO_READ`
 * Print values over UART for confirmation
 
-### Example Register Definitions in C
+### Register Definitions Used in C
 
 ```c
 #define GPIO_BASE  0x20000000
@@ -861,23 +861,25 @@ A C test program was written to explicitly exercise **all GPIO registers** from 
 ### Example Test Sequence
 
 ```c
-GPIO_DIR  = 0x0F;      // Set lower 4 GPIOs as outputs
-GPIO_DATA = 0x05;      // Drive pattern 0101
+GPIO_DIR  = 0x0F;   // Configure lower 4 GPIO pins as outputs
+GPIO_DATA = 0x05;   // Drive pattern 0101
 unsigned int val = GPIO_READ;
 print_hex(val);
 ```
 
-This sequence directly maps to the register behavior defined in **Step 1**.
+This directly matches the register behavior defined during design.
 
-📸 **Screenshot to include**
+#### Screenshot
 
-* `gpio_test.c` showing GPIO register access and writes
+```md
+![GPIO Test C Program](snapshots/gpio_test_C.png)
+```
 
 ---
 
 ## Step 4.2: Cleaning Previous Firmware Builds
 
-Before building new firmware, all old artifacts were removed to avoid stale binaries.
+Before building new firmware, all previous build artifacts were removed to avoid using stale binaries.
 
 ### Commands Used
 
@@ -887,10 +889,13 @@ make clean || true
 rm -f *.hex *.elf
 ```
 
-This ensures:
+This ensures the generated HEX file always corresponds to the current firmware source.
 
-* No outdated firmware is accidentally reused
-* The generated HEX corresponds exactly to the current C code
+#### Screenshot
+
+```md
+![Removed Previous Builds](snapshots/removed_prev_builds.png)
+```
 
 ---
 
@@ -906,7 +911,7 @@ make gpio_test.bram.elf
 
 This step performs:
 
-* C compilation using `riscv32-unknown-elf-gcc`
+* C compilation using the RISC-V toolchain
 * Assembly of startup code
 * Linking using `bram.ld`
 
@@ -914,17 +919,17 @@ This step performs:
 
 * `gpio_test.bram.elf`
 
-📸 **Screenshot to include**
+#### Screenshot
 
-* Terminal output showing successful ELF generation
+```md
+![BRAM ELF Generation](snapshots/gpio_test_bram_elf.png)
+```
 
 ---
 
-## Step 4.4: Generating the BRAM HEX File (CRITICAL STEP)
+## Step 4.4: Generating the BRAM HEX File (Critical Step)
 
-This is the **most commonly missed but absolutely required step**.
-
-The ELF file must be converted into a **word-addressable HEX file** that the RTL memory model can load.
+The ELF file must be converted into a word-addressable HEX file that the RTL memory model can load.
 
 ### Command Used
 
@@ -932,40 +937,41 @@ The ELF file must be converted into a **word-addressable HEX file** that the RTL
 make gpio_test.bram.hex
 ```
 
-Internally, this runs a tool similar to:
+Internally, this runs a conversion similar to:
 
 ```bash
 ./firmware_words gpio_test.bram.elf -ram 6144 -max_addr 6144 -out gpio_test.bram.hex
 ```
 
-### Why This Step Matters
+### Why This Step Is Critical
 
-* `$readmemh()` loads HEX files, not ELF
+* `$readmemh()` loads HEX files, not ELF files
 * Memory size must match the RTL BRAM
-* Without this step, the CPU executes invalid data
+* Skipping this step results in invalid instruction execution
 
-### Output Files
+### Output File
 
 * `gpio_test.bram.hex`
-* Terminal output confirming HEX generation
 
-📸 **Screenshot to include**
+#### Screenshot
 
-* Terminal output showing successful HEX generation
+```md
+![BRAM HEX Generation](snapshots/gpio_test_bram_hex.png)
+```
 
 ---
 
 ## Step 4.5: Copying the HEX File to the RTL Directory
 
-The generated HEX file was placed where the RTL memory expects it.
+The generated HEX file was copied to the RTL directory where the memory model expects it.
 
-### Commands Used
+### Command Used
 
 ```bash
 cp gpio_test.bram.hex ../RTL/firmware.hex
 ```
 
-The RTL memory loads it using:
+The RTL loads this file using:
 
 ```verilog
 initial begin
@@ -973,15 +979,17 @@ initial begin
 end
 ```
 
-📸 **Screenshot to include**
+#### Screenshot
 
-* `ls -l firmware.hex` in the RTL directory
+```md
+![Copy Firmware HEX to RTL](snapshots/copy_firmware_hex.png)
+```
 
 ---
 
-## Step 4.6: Running RTL Simulation
+## Step 4.6: Running the Full SoC Simulation
 
-The full SoC was simulated with the firmware executing on the RISC-V core.
+The complete SoC was simulated with the firmware executing on the RISC-V core.
 
 ### Commands Used
 
@@ -993,16 +1001,22 @@ iverilog -g2012 -DBENCH -o soc_sim riscv.v
 
 During simulation:
 
-* CPU fetches instructions from BRAM
+* The CPU fetches instructions from BRAM
 * Firmware executes automatically
 * GPIO registers are accessed by software
-* RTL debug messages are printed
+* Debug messages confirm register writes
+
+#### Screenshot
+
+```md
+![Full SoC Simulation Output](snapshots/full_soc_simulation.png)
+```
 
 ---
 
-## Step 4.7: Observing Terminal Simulation Output
+## Step 4.7: Observing Simulation Logs
 
-Typical simulation output:
+Typical simulation output includes:
 
 ```
 RAM words: 0 to 1535
@@ -1010,80 +1024,62 @@ RAM words: 0 to 1535
 [GPIO WRITE] addr=0 data=0x00000005 time=14855
 ```
 
-### Interpretation
+Interpretation:
 
-* `addr=1` → `GPIO_DIR` (offset `0x04`)
-* `addr=0` → `GPIO_DATA` (offset `0x00`)
+* `addr = 1` → GPIO_DIR (offset `0x04`)
+* `addr = 0` → GPIO_DATA (offset `0x00`)
 * Data values match firmware writes
 
-This confirms:
-
-* Correct address offset decoding
-* Correct register selection
-* Correct write sequencing
-
-📸 **Screenshot to include**
-
-* Terminal output showing GPIO write logs
+This confirms correct address decoding and register behavior.
 
 ---
 
-## Step 4.8: GTKWave-Based Signal-Level Validation
+## Step 4.8: GTKWave Signal-Level Validation
 
-To further validate behavior, GTKWave was used to inspect internal signals during simulation.
+To validate behavior at the signal level, GTKWave was used to inspect the generated waveform.
 
-### GTKWave Setup
+### Steps Performed
 
-The following dump was enabled in the `SOC` module:
+* VCD file generated during simulation
+* GTKWave opened using `soc.vcd`
+* Key signals observed:
 
-```verilog
-initial begin
-    $dumpfile("soc.vcd");
-    $dumpvars(0, SOC);
-end
-```
+  * `PC`
+  * `state`
+  * `mem_addr`
+  * `mem_wdata`
+  * `mem_wmask`
+  * `gpio_out`
+  * `gpio_rdata`
 
-GTKWave was launched using:
+### What Was Verified
 
-```bash
-gtkwave soc.vcd
-```
-
-### Signals Observed
-
-* `PC` – confirms instruction execution
-* `state` – confirms CPU FSM progression
-* `mem_addr`, `mem_wdata`, `mem_wmask` – bus activity
-* `gpio_out` – GPIO output register behavior
-* `gpio_rdata` – GPIO readback behavior
-
-### What the Waveform Confirms
-
-* Firmware executes correctly (`PC` increments)
+* `PC` increments correctly and matches instruction flow
+* FSM `state` transitions correctly
 * GPIO writes occur at correct addresses
-* GPIO output updates match software writes
-* Readback reflects correct GPIO state
-* No spurious or unintended signal toggles
+* `gpio_out` reflects values written by software
+* `gpio_rdata` matches expected readback
 
-📸 **Screenshot to include**
+#### Screenshot
 
-* GTKWave waveform showing CPU execution and GPIO activity
+```md
+![GTKWave Signal-Level Validation](snapshots/gtkwave.png)
+```
 
 ---
 
 ## Step 4.9: Handling Output Differences
 
-If simulation output differs slightly:
+Minor differences in simulation output are acceptable:
 
-* Timing values may differ → **expected**
-* Print order may vary → **acceptable**
-* Data values **must** match firmware intent
+* Timing values may differ
+* Order of debug prints may vary
 
 As long as:
 
-* `GPIO_DIR` is written first
-* `GPIO_DATA` follows
-* `GPIO_READ` returns the expected value
+* `GPIO_DIR` is written before `GPIO_DATA`
+* Written data matches firmware intent
+* Readback values are correct
 
 The validation is considered successful.
 
@@ -1091,15 +1087,15 @@ The validation is considered successful.
 
 ## Outcome of Step 4
 
-By the end of this step:
+By completing this step:
 
-* GPIO IP is proven usable by software
-* Register map behaves exactly as defined
+* GPIO IP is proven usable from software
+* Register map behaves exactly as designed
 * Address decoding is correct
 * Software–hardware contract is fully validated
-* Design is ready for FPGA programming (Step 5)
+* The design is ready for FPGA hardware validation (Step 5)
 
-This step completes **functional validation of the GPIO IP**.
+This completes functional verification of the GPIO Control IP.
 
 ---
 
