@@ -497,6 +497,8 @@ This step is strictly RTL IP implementation.
 
 ### Evidence to Include for Step 2
 
+![GPIO Control IP RTL](snapshots/gpio_ctrl_ip.png)
+
 `gpio_ctrl_ip.v` showing:
 
 * Register declarations
@@ -755,6 +757,8 @@ This step is strictly SoC-level integration.
 ---
 
 ### Evidence to Include for Step 3
+
+![GPIO Integrated into SoC](snapshots/gpio_integration.png)
 
 SOC module showing:
 
