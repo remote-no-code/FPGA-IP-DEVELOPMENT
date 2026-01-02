@@ -871,9 +871,7 @@ This directly matches the register behavior defined during design.
 
 #### Screenshot
 
-```md
 ![GPIO Test C Program](snapshots/gpio_test_C.png)
-```
 
 ---
 
@@ -893,9 +891,7 @@ This ensures the generated HEX file always corresponds to the current firmware s
 
 #### Screenshot
 
-```md
 ![Removed Previous Builds](snapshots/removed_prev_builds.png)
-```
 
 ---
 
@@ -921,9 +917,7 @@ This step performs:
 
 #### Screenshot
 
-```md
 ![BRAM ELF Generation](snapshots/gpio_test_bram_elf.png)
-```
 
 ---
 
@@ -955,9 +949,7 @@ Internally, this runs a conversion similar to:
 
 #### Screenshot
 
-```md
 ![BRAM HEX Generation](snapshots/gpio_test_bram_hex.png)
-```
 
 ---
 
@@ -1008,9 +1000,7 @@ During simulation:
 
 #### Screenshot
 
-```md
 ![Full SoC Simulation Output](snapshots/full_soc_simulation.png)
-```
 
 ---
 
@@ -1062,9 +1052,7 @@ To validate behavior at the signal level, GTKWave was used to inspect the genera
 
 #### Screenshot
 
-```md
 ![GTKWave Signal-Level Validation](snapshots/gtkwave.png)
-```
 
 ---
 
