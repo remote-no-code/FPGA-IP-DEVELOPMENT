@@ -1,7 +1,3 @@
-Here is the documentation converted into a first-person perspective, preserving all details, structure, and technical content.
-
----
-
 # Task-3: Design a Multi-Register GPIO IP with Software Control
 
 ## Overview
@@ -61,11 +57,11 @@ Task-3/
 
 I used the links below to navigate through each step of my Task-3 work:
 
-* **[Step 1: Study and Plan (Mandatory)](https://www.google.com/search?q=%23step-1-study-and-plan-mandatory)**
-* **[Step 2: Implement Multi-Register GPIO RTL (Mandatory)](https://www.google.com/search?q=%23step-2-implement-multi-register-gpio-rtl-mandatory)**
-* **[Step 3: Integrate the Multi Register GPIO IP into the SoC (Mandatory)](https://www.google.com/search?q=%23step-3-integrate-the-multi-register-gpio-ip-into-the-soc-mandatory)**
-* **[Step 4: Software Validation (Mandatory)](https://www.google.com/search?q=%23step-4-software-validation-mandatory)**
-* **[Step 5: Hardware Validation (Optional)](https://www.google.com/search?q=%23step-5-hardware-validation-optional)**
+* [Step 1: Study and Plan](#step-1-study-and-plan-mandatory)
+* [Step 2: Implement Multi-Register GPIO RTL](#step-2-implement-multi-register-gpio-rtl-mandatory)
+* [Step 3: Integrate the Multi Register GPIO IP into the SoC](#step-3-integrate-the-multi-register-gpio-ip-into-the-soc-mandatory)
+* [Step 4: Software Validation](#step-4-software-validation-mandatory)
+* [Step 5: Hardware Validation](#step-5-hardware-validation-optional)
 
 ---
 
