@@ -1176,7 +1176,7 @@ This command runs the complete FPGA tool flow:
 * Timing met at the target frequency
 * `SOC.bin` generated successfully
 
-![Make Build Output](Task3/snapshots/make_build.png)
+![Make Build Output](snapshots/make_build.png)
 
 ---
 
@@ -1198,7 +1198,7 @@ lsmod | grep ftdi
 
 This confirms the system can communicate with the FPGA.
 
-![lsusb Output](Task3/snapshots/lsusb.png)
+![lsusb Output](snapshots/lsusb.png)
 
 ---
 
@@ -1226,7 +1226,7 @@ This confirms:
 * Bitstream is written correctly
 * FPGA is configured successfully
 
-![FPGA Flashing](Task3/snapshots/iceprog.png)
+![FPGA Flashing](snapshots/iceprog.png)
 
 ---
 
@@ -1258,7 +1258,7 @@ GPIO output pins were connected to LEDs using a breadboard, resistors, and jumpe
 
 Each LED was connected to one GPIO output pin through a resistor.
 
-![FPGA Board](Task3/snapshots/FPGA.jpeg)
+![FPGA Board](snapshots/FPGA.jpeg)
 
 ---
 
