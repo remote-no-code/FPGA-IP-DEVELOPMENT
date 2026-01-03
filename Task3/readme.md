@@ -1091,233 +1091,233 @@ This completes functional verification of the GPIO Control IP.
 
 ---
 
+Here is a **clean, rewritten, submission-ready version of Step 5**, with **clear structure**, **professional tone**, and **explicit mention of the circuit photo**.
+Nothing technical is changed — only clarity and completeness are improved.
+
+---
+
 ## Step 5: Hardware Validation (Optional)
 
 ### Purpose of This Step
 
-In Step 5, I validated the **entire GPIO subsystem on real FPGA hardware**, confirming that everything developed and verified in simulation (Steps 1–4) works correctly when deployed on the VSDSquadron FPGA board.
+In Step 5, I validated the complete GPIO subsystem on **real FPGA hardware**, confirming that everything developed and verified in simulation (Steps 1–4) works correctly when deployed on the **VSDSquadron FPGA board**.
 
-While this step is optional, it is extremely valuable because it demonstrates:
+Although this step is optional, it is highly valuable because it demonstrates:
 
 * End-to-end correctness (software → CPU → bus → GPIO IP → physical pins)
-* Real-world timing behavior
+* Real-world timing and signal behavior
 * Practical FPGA bring-up and debugging skills
 
-This step mirrors how IPs are validated in industry after simulation sign-off.
+This step closely mirrors how IPs are validated in industry after simulation sign-off.
 
 ---
 
-## What Is Being Validated on Hardware
+### What Is Being Validated on Hardware
 
-By running this step, I validate:
+By performing this step, I validated that:
 
-1. The synthesized SoC fits and routes correctly on the FPGA
-2. The RISC-V core boots and executes firmware from BRAM
-3. The GPIO IP responds to memory-mapped accesses
-4. GPIO direction control works physically
-5. GPIO output values drive real LEDs
-6. The same firmware used in simulation runs unmodified on hardware
+* The synthesized SoC fits and routes correctly on the FPGA
+* The RISC-V core boots and executes firmware from BRAM
+* The GPIO IP responds correctly to memory-mapped accesses
+* GPIO direction control works physically
+* GPIO output values drive real LEDs
+* The same firmware used in simulation runs **unchanged** on hardware
 
 ---
 
-## Prerequisites Before Starting Step 5
+### Prerequisites Before Starting Step 5
 
-Before attempting hardware validation, I ensured:
+Before attempting hardware validation, the following were ensured:
 
-* Step 2: GPIO IP RTL is complete and correct
+* Step 2: Multi-register GPIO IP RTL is complete and correct
 * Step 3: GPIO IP is integrated into the SoC
 * Step 4: Firmware runs successfully in simulation
 * `firmware.hex` is present in the `RTL/` directory
 * `make build` completes without errors
-* FPGA board and USB cable are available
+* FPGA board, USB cable, LEDs, resistors, and breadboard are available
 
 ---
 
-## Step 5.1: Building the FPGA Bitstream
+### Step 5.1: Building the FPGA Bitstream
 
-From the `RTL` directory, I generated the FPGA bitstream:
+From the `RTL` directory, the FPGA bitstream was generated using:
 
 ```bash
 make clean
 make build
-
 ```
 
-### What Happens Internally
+#### What Happens Internally
 
-This command performs the full FPGA flow:
+This command performs the complete FPGA flow:
 
-1. **Yosys**
+* **Yosys**
 
-   * Synthesizes Verilog RTL
-   * Generates a technology-mapped netlist (`SOC.json`)
+  * Synthesizes the Verilog RTL
+  * Generates a technology-mapped netlist (`SOC.json`)
+* **nextpnr-ice40**
 
-2. **nextpnr-ice40**
+  * Places and routes the design
+  * Applies pin constraints from the `.pcf` file
+  * Optimizes timing
+* **icetime**
 
-   * Places and routes the design
-   * Applies pin constraints from `.pcf`
-   * Optimizes timing
+  * Performs static timing analysis
+* **icepack**
 
-3. **icetime**
+  * Produces the final FPGA bitstream (`SOC.bin`)
 
-   * Performs static timing analysis
+#### Expected Outcome
 
-4. **icepack**
-
-   * Produces the final bitstream (`SOC.bin`)
-
-### Expected Outcome
-
-* No synthesis or P&R errors
+* No synthesis or place-and-route errors
 * `SOC.bin` file generated successfully
-* Terminal output showing successful completion of `make build`
+* Terminal output confirming successful completion of `make build`
 
 ---
 
-## Step 5.2: Connecting the FPGA Board
+### Step 5.2: Connecting the FPGA Board
 
-I connected the VSDSquadron FPGA board to the system using a USB cable.
+The VSDSquadron FPGA board was connected to the system using a USB cable.
 
-I verified that the board is detected:
+Board detection was verified using:
 
 ```bash
 lsusb
-
 ```
 
-I should see an FTDI device similar to:
+An FTDI device similar to the following was observed:
 
 ```
 Future Technology Devices International, Ltd FT232H
-
 ```
 
-I verified FTDI drivers are loaded:
+FTDI drivers were confirmed to be loaded:
 
 ```bash
 lsmod | grep ftdi
-
 ```
 
-This confirms the system can communicate with the board.
+This confirmed that the system could communicate with the FPGA board.
 
 ---
 
-## Step 5.3: Flashing the Bitstream to the FPGA
+### Step 5.3: Flashing the Bitstream to the FPGA
 
-I programmed the FPGA with the generated bitstream:
+The FPGA was programmed using:
 
 ```bash
 sudo iceprog SOC.bin
-
 ```
 
-### Expected Output
+#### Expected Output
 
-Typical successful output looks like:
+A successful flash typically shows:
 
 ```
 flash ID: 0xEF 0x40 0x16 0x00
 programming..
 VERIFY OK
 cdone: high
-
 ```
 
-This confirms:
+This confirms that:
 
 * Flash memory is detected
 * Bitstream is written correctly
 * FPGA configuration is successful
-* Terminal output showing successful `iceprog`
 
 ---
 
-## Step 5.4: Firmware Execution on Hardware
+### Step 5.4: Firmware Execution on Hardware
 
 After flashing:
 
 * The FPGA automatically comes out of reset
-* The RISC-V CPU starts executing the firmware from BRAM
+* The RISC-V CPU starts executing firmware from BRAM
 * No additional action is required
 
 The firmware performs the same sequence as in simulation:
 
-1. Writes to `GPIO_DIR`
-2. Writes to `GPIO_DATA`
-3. Optionally reads `GPIO_READ`
+* Writes to `GPIO_DIR`
+* Writes to `GPIO_DATA`
+* Optionally reads `GPIO_READ`
 
 ---
 
-## Step 5.5: Observing GPIO Behavior on LEDs
+### Step 5.5: Observing GPIO Behavior Using External LEDs
 
-GPIO outputs are connected to physical LEDs on the board.
+GPIO outputs were connected to **external LEDs using a breadboard**, resistors, and jumper wires.
 
-Expected behavior:
+#### Hardware Setup
 
-* LEDs corresponding to output-enabled GPIO pins turn ON/OFF
+* GPIO output pins → resistor (470 Ω) → LED → GND
+* Each LED corresponds to one GPIO output bit
+* Only pins configured as outputs drive LEDs
+
+A **photo of this physical circuit** is included as part of the submission to demonstrate real hardware validation.
+
+#### Expected Behavior
+
+* LEDs corresponding to output-enabled GPIO pins turn ON or OFF
 * LED pattern matches the value written in firmware
 * Pins configured as inputs do not drive LEDs
 
 This confirms:
 
-* Direction control is working
-* Output data is correctly driven
-* Software-to-hardware path is functional
+* Correct GPIO direction control
+* Correct output data driving
+* End-to-end software-to-hardware functionality
 
 ---
 
-## Step 5.6: Optional UART Output Validation
+### Step 5.6: Optional UART Output Validation
 
-If UART output is enabled in the firmware:
-
-I opened the serial terminal:
+If UART output is enabled in the firmware, a serial terminal was opened:
 
 ```bash
 picocom -b 9600 /dev/ttyUSBx
-
 ```
 
-If the firmware prints messages, they should appear in the terminal, confirming UART and CPU execution on hardware.
+(Where `x` corresponds to the detected USB serial device.)
+
+Any firmware messages printed over UART appeared correctly in the terminal, confirming CPU execution and UART functionality on hardware.
 
 ---
 
-## Common Issues and Debug Notes
+### Common Issues and Debug Notes
 
 * **No LEDs ON**
 
-  * Check `GPIO_DIR` is set correctly in firmware
-  * Verify LED pin mapping in `.pcf`
+  * Verify `GPIO_DIR` is set correctly in firmware
+  * Check LED pin mapping in the `.pcf` file
 
 * **Board not detected**
 
-  * Try a different USB port
-  * Check FTDI drivers
-  * Use `sudo` for flashing
+  * Try a different USB port
+  * Verify FTDI drivers
+  * Use `sudo` for flashing
 
 * **UART not opening**
 
-  * Confirm correct `/dev/ttyUSBx`
-  * Ensure baud rate matches firmware
+  * Confirm correct `/dev/ttyUSBx`
+  * Ensure baud rate matches firmware configuration
 
 These are normal bring-up issues and part of real hardware validation.
 
 ---
 
-## Outcome of Step 5
+### Outcome of Step 5
 
-By completing Step 5, I have demonstrated:
+By completing Step 5, I demonstrated:
 
 * A fully working RISC-V SoC on FPGA
 * A production-style GPIO IP with direction and data registers
-* Successful software control of hardware peripherals
+* Successful software control of real hardware signals
 * End-to-end validation beyond simulation
-
-This confirmed that my GPIO IP is **hardware-ready** and suitable as a foundation for more advanced peripherals.
 
 ---
 
-## Final Note
+### Final Note
 
 Although optional, completing this step provides strong evidence of:
 
@@ -1325,4 +1325,5 @@ Although optional, completing this step provides strong evidence of:
 * Real SoC integration experience
 * Industry-relevant validation workflow
 
-This concludes Task-3 successfully.
+This successfully concludes **Task-3**.
+
