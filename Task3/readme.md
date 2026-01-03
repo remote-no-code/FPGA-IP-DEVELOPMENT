@@ -1188,7 +1188,7 @@ lsusb
 An FTDI device similar to the following was observed:
 
 ```
-Future Technology Devices International, Ltd FT232H
+Bus 001 Device 037: ID 0403:6014 Future Technology Devices International, Ltd FT232H Single HS USB-UART/FIFO IC
 ```
 
 FTDI drivers were confirmed to be loaded:
