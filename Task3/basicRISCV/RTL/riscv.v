@@ -91,13 +91,15 @@ module Processor (
    
    integer     i;
    initial begin
-      for(i=0; i<32; ++i) begin
+      for(i=0; i<32; i=i+1) begin
 	 RegisterBank[i] = 0;
       end
    end
 
    initial begin
+   `ifndef SYNTHESIS
         $display("RAM words: 0 to %0d", 1535);
+    `endif
     end
 
 
@@ -329,26 +331,46 @@ endmodule
 
 
 module SOC (
+    input            CLK,
     input            RESET,
     output reg [4:0] LEDS,
     input            RXD,
     output           TXD
 );
 
-    // ============================================================
-    // Clock & Reset (SIMULATION)
-    // ============================================================
-    reg clk_sim = 0;
-    reg rst_sim = 1;
+    wire clk;
+	wire resetn;
 
-    always #5 clk_sim = ~clk_sim;
+	`ifndef SYNTHESIS
+		// ---------------- SIMULATION ONLY ----------------
+		reg clk_sim = 0;
+		reg rst_sim = 1;
 
-    initial begin
-        #100 rst_sim = 0;
-    end
+		always #5 clk_sim = ~clk_sim;
 
-    wire clk    = clk_sim;
-    wire resetn = ~rst_sim;
+		initial begin
+		    #100 rst_sim = 0;
+		end
+
+		assign clk    = clk_sim;
+		assign resetn = ~rst_sim;
+
+		initial begin
+		    $dumpfile("soc.vcd");
+		    $dumpvars(0, SOC);
+		end
+	`else
+		// ---------------- HARDWARE ONLY ----------------
+		Clockworks #(
+		    .SLOW(0)
+		) CW (
+		    .CLK   (CLK),
+		    .RESET (RESET),
+		    .clk   (clk),
+		    .resetn(resetn)
+		);
+	`endif
+
 
     // ============================================================
     // CPU ↔ BUS
@@ -381,7 +403,7 @@ module SOC (
     wire is_uart = (mem_addr[31:12] == UART_BASE[31:12]);
     wire is_gpio = (mem_addr[31:12] == GPIO_BASE[31:12]);
 
-    // ✅ THIS IS THE CRITICAL FIX
+    // Critical fix: avoid X-PC
     wire is_ram  = ~(is_uart | is_gpio);
 
     // ============================================================
@@ -399,7 +421,7 @@ module SOC (
     );
 
     // ============================================================
-    // GPIO (Task-3) — CORRECT
+    // GPIO (Task-3)
     // ============================================================
     wire [31:0] gpio_rdata;
     wire [31:0] gpio_out;
@@ -414,24 +436,27 @@ module SOC (
         .bus_wdata  (mem_wdata),
         .bus_rdata  (gpio_rdata),
 
-        .gpio_in    (32'b0),     // OK for simulation
+        .gpio_in    (32'b0),   // simulation-only
         .gpio_out   (gpio_out)
     );
 
+    // Drive LEDs from GPIO output
     always @(posedge clk)
         LEDS <= resetn ? gpio_out[4:0] : 5'b0;
 
+    // GPIO write debug (simulation)
     always @(posedge clk) begin
         if (is_gpio && |mem_wmask) begin
+        `ifndef SYNTHESIS
             $display(
                 "[GPIO WRITE] addr=%0d data=0x%08x time=%0t",
                 mem_addr[3:2],
                 mem_wdata,
                 $time
             );
+        `endif
         end
     end
-    
 
     // ============================================================
     // UART
@@ -452,7 +477,7 @@ module SOC (
     );
 
     // ============================================================
-    // READ MUX (THIS FIXES X-PC)
+    // READ MUX
     // ============================================================
     assign mem_rdata =
         is_ram  ? ram_rdata  :
@@ -461,11 +486,14 @@ module SOC (
         32'b0;
 
     // ============================================================
-    // UART CONSOLE OUTPUT (SIM ONLY)
+    // UART CONSOLE OUTPUT (SIMULATION)
     // ============================================================
-    always @(posedge clk)
-        if (uart_valid)
+    always @(posedge clk) begin
+        if (uart_valid) begin
+        `ifndef SYNTHESIS
             $write("%c", mem_wdata[7:0]);
-
-
+        `endif
+        end
+    end
 endmodule
+
