@@ -255,13 +255,11 @@ Step 1 ensures that:
 
 No RTL is written in this step — only understanding.
 
-Here's your text formatted in clean, GitHub-ready markdown:
-
 ***
 
 # Step 2 – Write the GPIO IP RTL (Mandatory)
 
-This step focuses on **designing a standalone, correct GPIO IP block** that follows the **existing SoC bus protocol** discovered in Step 1.[1][2]
+This step focuses on **designing a standalone, correct GPIO IP block** that follows the **existing SoC bus protocol** discovered in Step 1.
 
 At this stage:
 - The GPIO IP is **not yet connected to the SoC**
@@ -288,7 +286,7 @@ By the end of this step, the following must be achieved:
 
 ## Why Step 2 Exists Separately
 
-Step 2 isolates **IP correctness** from **system integration**.[1]
+Step 2 isolates **IP correctness** from **system integration**
 
 This separation ensures:
 - The GPIO logic can be verified independently
@@ -339,7 +337,7 @@ module gpio_ip (
 | `rdata`    | Data returned to CPU           |
 | `gpio_out` | External/internal GPIO signal  |
 
-This interface matches the SoC bus behavior observed in Step 1.[2][3]
+This interface matches the SoC bus behavior observed in Step 1.
 
 ***
 
@@ -413,7 +411,7 @@ Allows GPIO to:
 - Be observed internally
 - Be routed to FPGA pins later
 
-This separation allows clean SoC integration in Step 3.[1]
+This separation allows clean SoC integration in Step 3.
 
 ***
 
@@ -425,7 +423,7 @@ This screenshot shows the RTL implementation of a 32-bit GPIO register with sync
 
 ## Key Learnings from Step 2
 
-- How to design a bus-compliant peripheral[2][1]
+- How to design a bus-compliant peripheral
 - How byte masking works in practice
 - Importance of synchronous resets
 - Difference between storage, readback, and output logic
@@ -444,13 +442,11 @@ With the GPIO IP now complete:
 
 ---
 
-Here's your Step 3 documentation formatted in clean, GitHub-ready markdown:
-
 ***
 
 # Step 3 – Integrate the GPIO IP into the SoC (Mandatory)
 
-This step integrates the **previously designed GPIO IP** into the existing RISC-V SoC. The goal is to make the GPIO a **first-class memory-mapped peripheral** that the CPU can access just like RAM, LEDs, and UART.[1][2]
+This step integrates the **previously designed GPIO IP** into the existing RISC-V SoC. The goal is to make the GPIO a **first-class memory-mapped peripheral** that the CPU can access just like RAM, LEDs, and UART.
 
 At this stage:
 - No new functionality is added to the GPIO IP
@@ -464,7 +460,7 @@ At this stage:
 By the end of this step, the following must be true:
 
 - The GPIO IP is instantiated inside the SoC
-- The SoC address decoder recognizes the GPIO address[3][4]
+- The SoC address decoder recognizes the GPIO address
 - CPU bus signals are correctly connected to the GPIO
 - GPIO output is exposed internally (and optionally externally)
 - The system still compiles and simulates correctly
@@ -521,7 +517,7 @@ localparam IO_GPIO_bit = 3;
 | `mem_wordaddr`   | 1 << 3          |
 | GPIO base address| `0x00400020`    |
 
-This address is later used by software.[5][6]
+This address is later used by software.
 
 ***
 
@@ -554,7 +550,7 @@ gpio_ip GPIO (
 | `rdata`    | Returned to CPU                           |
 | `gpio_out` | Drives LEDs / external pins               |
 
-The GPIO IP now behaves like any other memory-mapped register.[2][1]
+The GPIO IP now behaves like any other memory-mapped register.
 
 ***
 
@@ -571,7 +567,7 @@ assign mem_rdata = isRAM ? RAM_rdata : IO_rdata;
 
 ### What This Achieves
 
-- CPU reads from GPIO using normal `LW` instructions[5]
+- CPU reads from GPIO using normal `LW` instructions
 - GPIO readback coexists cleanly with UART and other IO
 - No interference with RAM reads
 
@@ -611,11 +607,11 @@ GPIO peripheral integrated into SoC with memory-mapped address decoding
 
 ## Key Learnings from Step 3
 
-- How peripherals are integrated into a SoC[1][2]
-- Importance of clean address decoding[4][3]
+- How peripherals are integrated into a SoC
+- Importance of clean address decoding
 - How CPU bus signals are reused across devices
-- Difference between RTL correctness and system correctness[7]
-- Why integration bugs are common in real SoC design[8]
+- Difference between RTL correctness and system correctness
+- Why integration bugs are common in real SoC design
 
 ***
 
@@ -630,15 +626,13 @@ At this point:
 
 ---
 
-Here's your Step 4 documentation formatted in clean, GitHub-ready markdown:
-
 ***
 
 # Step 4 – Validate Using Simulation (Mandatory)
 
-This step **proves correctness** of the GPIO IP integration using **software + RTL simulation**. Until now, all work was structural. In this step, we **execute code on the CPU** and verify real behavior.[1][2]
+This step **proves correctness** of the GPIO IP integration using **software + RTL simulation**. Until now, all work was structural. In this step, we **execute code on the CPU** and verify real behavior.
 
-Simulation validation is **mandatory** for task completion.[3][4]
+Simulation validation is **mandatory** for task completion.
 
 ***
 
@@ -732,7 +726,7 @@ int main() {
 | `val = *gpio`     | Load word from GPIO register    |
 | `print_hex(val)`  | Confirms readback via UART      |
 
-This tests both directions of the bus.[6][5]
+This tests both directions of the bus.
 
 ***
 
@@ -761,7 +755,7 @@ This confirms:
 
 ### 3️⃣ RTL Simulation (iverilog + vvp)
 
-Simulation command:[9]
+Simulation command:
 
 ```bash
 iverilog -g2012 -DBENCH -o soc_sim riscv.v
@@ -822,7 +816,7 @@ gtkwave soc.vcd
 | `SOC.mem_wordaddr`   | Equals `IO_GPIO_bit`  |
 | `SOC.mem_wstrb`      | High during write     |
 
-These observations are crucial for debugging and verification.[1][2]
+These observations are crucial for debugging and verification.
 
 ***
 
@@ -851,10 +845,10 @@ GTKWAVE waveform view
 
 ## Key Learnings from Step 4
 
-- How software interacts with memory-mapped hardware[5][6]
+- How software interacts with memory-mapped hardware
 - Importance of readback validation
-- Using waveforms to debug SoC-level behavior[2][1]
-- Difference between signal correctness and functional correctness[4][3]
+- Using waveforms to debug SoC-level behavior
+- Difference between signal correctness and functional correctness
 - Why simulation is mandatory before hardware
 
 ***
