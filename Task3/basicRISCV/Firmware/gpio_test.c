@@ -1,6 +1,5 @@
 #include "io.h"
 #include "print.h"
-#include <stdarg.h>
 
 #define GPIO_BASE 0x20000000
 #define GPIO_DATA (*(volatile unsigned int *)(GPIO_BASE + 0x00))
@@ -8,16 +7,18 @@
 #define GPIO_READ (*(volatile unsigned int *)(GPIO_BASE + 0x08))
 
 int main() {
-    print_string("GPIO Task-3 Test\n");
+    // Configure GPIO[7:0] as output
+    GPIO_DIR = 0x000000FF;
 
-    GPIO_DIR  = 0x0000000F;   // GPIO[3:0] output
-    GPIO_DATA = 0x00000005;   // 0101
+    // Write test pattern
+    GPIO_DATA = 0x000000A5;
 
+    // Read back
     unsigned int r = GPIO_READ;
 
-    print_string("GPIO_READ = ");
-    print_hex(r);
+    // UART output
+    print_hex(r);        // prints 000000A5
     print_string("\n");
 
-    while (1);
+    while (1);           // stay here
 }
