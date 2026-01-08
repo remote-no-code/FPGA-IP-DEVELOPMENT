@@ -1000,7 +1000,7 @@ The complete SoC was simulated with the firmware executing on the RISC-V core.
 
 ```bash
 cd ../RTL
-iverilog -g2012 -DBENCH -o soc_sim riscv.v
+iverilog -g2012 -DSIMULATION -DBENCH -o soc_sim riscv.v
 vvp soc_sim
 ```
 ![Full SoC View](snapshots/full_soc.png)
