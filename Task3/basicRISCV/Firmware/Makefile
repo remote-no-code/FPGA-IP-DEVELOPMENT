@@ -3,7 +3,7 @@ ABI = ilp32
 RVASFLAGS= -march=$(ARCH) -mabi=$(ABI) 
 RVCFLAGS= $(RVINCS) -fno-pic -march=$(ARCH) -mabi=$(ABI) \
          -fno-stack-protector -w -Wl,--no-relax
-RVINCS=-I . -I ./LIBFEMTOGL -I ./LIBFEMTORV32 -I ./LIBFEMTOC
+RVINCS=-I ./LIBFEMTOGL -I ./LIBFEMTORV32 -I ./LIBFEMTOC
 RAM_SIZE=6144
 
 LIBOBJECTS=putchar.o wait.o print.o memcpy.o errno.o perf.o
@@ -39,4 +39,4 @@ RVRANLIB= riscv64-unknown-elf-ranlib
 	echo $@ > ../RTL/firmware.txt
 
 clean:
-	rm *.bram.hex
+	rm -f *.bram.hex
