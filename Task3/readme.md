@@ -948,6 +948,7 @@ The ELF file was converted into a HEX file suitable for RTL BRAM initialization.
 ```bash
 make gpio_test.bram.hex
 ```
+![BRAM Hex File Generation](snapshots/bram_hex_file.png)
 
 Internally, this executes:
 
@@ -1153,7 +1154,7 @@ From the `RTL` directory, I attempted to generate the FPGA bitstream:
 make clean
 make build
 ```
-![Make Build Process](snapshots/make_build.png)
+![Make Build Process](snapshots/build_logs.png)
 
 ### Observations
 
@@ -1251,40 +1252,11 @@ However:
 * The terminal remained blank
 * No characters were observed
 
-### Reason (Expected)
-
-This is attributed to one or more of the following **known, acceptable causes**:
-
-* Clock mismatch due to PLL / constraint issues
-* UART baud rate sensitivity to clock frequency
-* UART being verified primarily in simulation, not hardware
-
 Importantly:
 
 * UART output **was fully verified in simulation**
 * UART hardware output is **not mandatory** for Task-3
 * GPIO validation does **not depend on UART output**
-
----
-
-## Why This Is Still a Valid Task-3 Submission
-
-Task-3 evaluation criteria emphasize:
-
-1. **Correct GPIO IP design**
-2. **Correct SoC integration**
-3. **Correct software control**
-4. **Correct simulation-based validation**
-
-All of the above were completed successfully.
-
-Hardware validation is explicitly marked **optional**, and partial hardware validation is fully acceptable when:
-
-* Simulation evidence is complete
-* Limitations are clearly documented
-* No incorrect claims are made
-
-This step demonstrates **practical awareness of real FPGA bring-up challenges**, which is a positive signal, not a failure.
 
 ---
 
