@@ -6,9 +6,14 @@
 `default_nettype none
 `include "clockworks.v"
 
-`include "emitter_uart.v"
-
 `include "gpio_ctrl_ip.v"
+
+
+`ifdef BENCH
+    `include "uart_stub.v"     // prints to terminal
+`else
+    `include "emitter_uart.v"  // real UART
+`endif
 
 module Memory (
    input             clk,
@@ -318,6 +323,12 @@ module Processor (
    assign mem_rstrb = (state == FETCH_INSTR || state == LOAD);
    assign mem_wmask = {4{(state == STORE)}} & STORE_wmask;
 
+	/*always @(posedge clk) begin
+		if (state == EXECUTE) begin
+		    $display("PC=%08x instr=%08x", PC, instr);
+		end
+	end*/
+
     // ------------------------------------------------------------
     // DEBUG: Print only when instruction is valid
     // ------------------------------------------------------------
@@ -338,43 +349,41 @@ module SOC (
     output           TXD
 );
 
+    // ------------------------------------------------------------
+    // Clock & Reset
+    // ------------------------------------------------------------
     wire clk;
-	wire resetn;
+    wire resetn;
 
-	`ifndef SYNTHESIS
-		// ---------------- SIMULATION ONLY ----------------
-		reg clk_sim = 0;
-		reg rst_sim = 1;
+`ifndef SYNTHESIS
+    reg clk_sim = 0;
+    reg rst_sim = 1;
 
-		always #5 clk_sim = ~clk_sim;
+    always #5 clk_sim = ~clk_sim;
 
-		initial begin
-		    #100 rst_sim = 0;
-		end
+    initial begin
+        #100 rst_sim = 0;
+    end
 
-		assign clk    = clk_sim;
-		assign resetn = ~rst_sim;
+    assign clk    = clk_sim;
+    assign resetn = ~rst_sim;
 
-		initial begin
-		    $dumpfile("soc.vcd");
-		    $dumpvars(0, SOC);
-		end
-	`else
-		// ---------------- HARDWARE ONLY ----------------
-		Clockworks #(
-		    .SLOW(0)
-		) CW (
-		    .CLK   (CLK),
-		    .RESET (RESET),
-		    .clk   (clk),
-		    .resetn(resetn)
-		);
-	`endif
+    initial begin
+        $dumpfile("soc.vcd");
+        $dumpvars(0, SOC);
+    end
+`else
+    Clockworks #(.SLOW(0)) CW (
+        .CLK    (CLK),
+        .RESET  (RESET),
+        .clk    (clk),
+        .resetn (resetn)
+    );
+`endif
 
-
-    // ============================================================
+    // ------------------------------------------------------------
     // CPU ↔ BUS
-    // ============================================================
+    // ------------------------------------------------------------
     wire [31:0] mem_addr;
     wire [31:0] mem_rdata;
     wire        mem_rstrb;
@@ -391,24 +400,18 @@ module SOC (
         .mem_wmask  (mem_wmask)
     );
 
-    // ============================================================
-    // Address Map
-    // ============================================================
+    // ------------------------------------------------------------
+    // Address Map (WORD-ALIGNED)
+    // ------------------------------------------------------------
     localparam UART_BASE = 32'h4000_0000;
-    localparam UART_DAT  = UART_BASE + 32'h8;
-    localparam UART_CTL  = UART_BASE + 32'h10;
+    localparam GPIO_BASE  = 32'h2000_0000;
 
-    localparam GPIO_BASE = 32'h2000_0000;
+    wire is_uart  = (mem_addr[31:12] == UART_BASE[31:12]);
+    wire is_gpio  = (mem_addr[31:12] == GPIO_BASE[31:12]);
 
-    wire is_uart = (mem_addr[31:12] == UART_BASE[31:12]);
-    wire is_gpio = (mem_addr[31:12] == GPIO_BASE[31:12]);
-
-    // Critical fix: avoid X-PC
-    wire is_ram  = ~(is_uart | is_gpio);
-
-    // ============================================================
+    // ------------------------------------------------------------
     // RAM
-    // ============================================================
+    // ------------------------------------------------------------
     wire [31:0] ram_rdata;
 
     Memory RAM (
@@ -420,80 +423,98 @@ module SOC (
         .mem_wmask  ({4{is_ram}} & mem_wmask)
     );
 
-    // ============================================================
-    // GPIO (Task-3)
-    // ============================================================
+    // ------------------------------------------------------------
+    // GPIO IP
+    // ------------------------------------------------------------
     wire [31:0] gpio_rdata;
     wire [31:0] gpio_out;
 
     gpio_ctrl_ip GPIO (
         .clk        (clk),
         .rst_n      (resetn),
-
-        .bus_valid  (is_gpio & (mem_rstrb | |mem_wmask)),
-        .bus_we     (|mem_wmask),
+        .bus_valid (is_gpio),
+		.bus_we    (is_gpio & |mem_wmask),
         .bus_addr   (mem_addr),
         .bus_wdata  (mem_wdata),
         .bus_rdata  (gpio_rdata),
-
-        .gpio_in    (32'b0),   // simulation-only
+        .gpio_in    (32'b0),
         .gpio_out   (gpio_out)
     );
 
-    // Drive LEDs from GPIO output
     always @(posedge clk)
         LEDS <= resetn ? gpio_out[4:0] : 5'b0;
 
-    // GPIO write debug (simulation)
-    always @(posedge clk) begin
-        if (is_gpio && |mem_wmask) begin
-        `ifndef SYNTHESIS
-            $display(
-                "[GPIO WRITE] addr=%0d data=0x%08x time=%0t",
-                mem_addr[3:2],
-                mem_wdata,
-                $time
-            );
-        `endif
-        end
-    end
 
-    // ============================================================
+    // ------------------------------------------------------------
     // UART
-    // ============================================================
-    wire uart_valid = is_uart & (mem_addr == UART_DAT) & |mem_wmask;
+    // ------------------------------------------------------------
+    localparam UART_DAT = UART_BASE + 32'h08;
+    localparam UART_CTL = UART_BASE + 32'h10;
+    
+    wire uart_valid = is_uart & (mem_addr[31:2] == UART_DAT[31:2]) & |mem_wmask;
+
     wire uart_ready;
 
-    corescore_emitter_uart #(
-        .clk_freq_hz(12_000_000),
-        .baud_rate  (9600)
-    ) UART (
-        .i_clk     (clk),
-        .i_rst     (!resetn),
-        .i_data    (mem_wdata[7:0]),
-        .i_valid   (uart_valid),
-        .o_ready   (uart_ready),
-        .o_uart_tx (TXD)
-    );
+    `ifndef BENCH
+	corescore_emitter_uart #(
+		.clk_freq_hz(12_000_000),
+		.baud_rate  (9600)
+	) UART (
+		.i_clk     (clk),
+		.i_rst     (!resetn),
+		.i_data    (mem_wdata[7:0]),
+		.i_valid   (uart_valid),
+		.o_ready   (uart_ready),
+		.o_uart_tx (TXD)
+	);
+	`else
+	corescore_emitter_uart UART (
+		.i_clk     (clk),
+		.i_rst     (!resetn),
+		.i_data    (mem_wdata[7:0]),
+		.i_valid   (uart_valid),
+		.o_ready   (uart_ready),
+		.o_uart_tx (TXD)
+	);
+	`endif
 
-    // ============================================================
-    // READ MUX
-    // ============================================================
-    assign mem_rdata =
-        is_ram  ? ram_rdata  :
-        is_gpio ? gpio_rdata :
-        (mem_addr == UART_CTL) ? {22'b0, !uart_ready, 9'b0} :
-        32'b0;
 
-    // ============================================================
+
+    // ------------------------------------------------------------
     // UART CONSOLE OUTPUT (SIMULATION)
-    // ============================================================
+    // ------------------------------------------------------------
+/*    
+`ifndef SYNTHESIS
     always @(posedge clk) begin
-        if (uart_valid) begin
-        `ifndef SYNTHESIS
+        if (uart_valid)
             $write("%c", mem_wdata[7:0]);
-        `endif
-        end
     end
-endmodule
+`endif
+*/
 
+/*	always @(posedge clk) begin
+		if (mem_wmask != 0) begin
+		    $display(
+		        "[WRITE] addr=%08x data=%08x wmask=%b is_uart=%b",
+		        mem_addr,
+		        mem_wdata,
+		        mem_wmask,
+		        is_uart
+		    );
+		end
+	end
+
+*/
+
+/*	always @(posedge clk) begin
+		if (is_uart) begin
+		    $display(
+		        "[UART SEL] addr=%08x valid=%b wmask=%b",
+		        mem_addr,
+		        uart_valid,
+		        mem_wmask
+		    );
+		end
+	end
+*/
+endmodule
