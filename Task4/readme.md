@@ -64,13 +64,6 @@ basicRISCV/
 
 ---
 
-
-Perfect. Below is **Step-1 written cleanly for your README**, in the same professional tone, **plus a clear answer on screenshots**.
-
-You can paste this **directly under the Step-1 heading** in `README.md`.
-
----
-
 ## 1. Timer IP Design
 
 ### Description
@@ -696,11 +689,7 @@ https://github.com/user-attachments/assets/32ad6317-54c3-4c5c-8900-bee985a86c5e
 The Timer IP was successfully demonstrated on real FPGA hardware, confirming that the design functions correctly beyond simulation and meets all Task-4 requirements.
 
 ---
-Here is the **final step (Step-7)**, written cleanly and ready to close Task-4 professionally.
 
-You can paste this **directly after Step-6** in your README.
-
----
 
 ## 7. Results & Observations
 
