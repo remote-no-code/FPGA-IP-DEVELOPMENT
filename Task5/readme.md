@@ -61,5 +61,3 @@ Detailed documentation is available in the `docs/` directory:
 
 ## License
 Educational / Open-source use for VSDSquadron FPGA
-```
-
