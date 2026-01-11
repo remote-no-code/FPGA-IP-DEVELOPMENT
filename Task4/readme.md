@@ -676,21 +676,9 @@ The hardware demonstration validates:
 
 ---
 
-### 📸 Screenshot / Evidence Requirement for Step-6
+### Evidence Requirement for Step-6
 
-📷 **Hardware evidence is required for this step**
-
-Recommended evidence:
-
-* Photo or short video of FPGA showing:
-
-  * On-board LED blinking
-  * External LED blinking simultaneously
-
-Optional (but strong):
-
-* Screenshot of terminal output (if UART used)
-* Board photo with LED connections visible
+https://github.com/user-attachments/assets/32ad6317-54c3-4c5c-8900-bee985a86c5e
 
 ---
 
