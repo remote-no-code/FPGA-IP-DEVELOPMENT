@@ -39,30 +39,7 @@ In periodic mode, the timer automatically reloads and continues operation.
 
 ## 4. Block Diagram (Conceptual)
 
-```
-        +----------------------+
-        |      RISC-V CPU      |
-        |                      |
-        |  Memory-Mapped Bus   |
-        +----------+-----------+
-                   |
-                   v
-        +----------------------+
-        |       Timer IP       |
-        |----------------------|
-        | Control Register     |
-        | Load Register        |
-        | Counter (Value) Reg  |
-        | Status Register      |
-        +----------+-----------+
-                   |
-            Timeout Pulse
-                   |
-                   v
-        +----------------------+
-        |   LED / HW Logic     |
-        +----------------------+
-```
+![Timer IP Block Diagram](Block_Diagram.png)
 
 ---
 
