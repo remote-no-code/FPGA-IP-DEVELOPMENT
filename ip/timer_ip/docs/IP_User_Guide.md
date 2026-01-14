@@ -2,119 +2,168 @@
 
 ## 1. Introduction
 
-The Timer IP is a **memory-mapped hardware timer peripheral** designed for the VSDSquadron FPGA platform.
-It allows software running on the on-board RISC-V processor to configure and control time-based operations without relying on software delay loops.
+The Timer IP is a **memory-mapped hardware timer peripheral** designed for the **VSDSquadron FPGA platform**.
+It allows software running on a RISC-V processor to perform accurate time-based operations **without using software delay loops**.
 
-Once configured, the Timer IP operates **autonomously in hardware**, generating timeout events that can be used to drive LEDs or other logic.
+Once configured, the Timer IP operates **autonomously in hardware**, generating timeout events that can be observed by software or used directly by hardware logic such as LEDs or control signals.
 
 ---
 
-## 2. Key Features
+## 2. Purpose of the IP
+
+The Timer IP provides a programmable countdown timer that can be used for:
+
+* Periodic heartbeat generation
+* Time delays and polling intervals
+* Hardware-driven LED blinking
+* Event triggering without CPU busy-wait loops
+
+This IP is intended to be **simple, reliable, and reusable** across VSDSquadron-based SoCs.
+
+---
+
+## 3. Key Features
 
 * 32-bit programmable countdown timer
 * Memory-mapped register interface
 * Software-controlled enable and mode selection
-* Periodic (auto-reload) operation
-* Hardware-generated timeout pulse
-* Suitable for delays, polling, and heartbeat indicators
-* Verified via simulation and FPGA hardware
+* One-shot and periodic (auto-reload) modes
+* Sticky timeout flag with write-one-to-clear (W1C) behavior
+* Hardware timeout signal for external logic
+* Verified using RTL simulation and FPGA hardware
 
 ---
 
-## 3. Functional Overview
+## 4. Functional Overview
 
-The Timer IP consists of:
+The Timer IP consists of the following logical components:
 
-* A **load register** that stores the countdown value
-* A **counter register** that decrements on each clock cycle
-* A **control register** to start and configure the timer
-* A **status register** that indicates timeout events
+* **Control Register (CTRL)**
+  Enables the timer and selects one-shot or periodic mode.
 
-When enabled, the timer loads the value from the load register and begins counting down.
-When the counter reaches zero, a **timeout pulse** is generated.
+* **Load Register (LOAD)**
+  Holds the initial countdown value programmed by software.
 
-In periodic mode, the timer automatically reloads and continues operation.
+* **Counter Register (VALUE)**
+  Decrements on every clock cycle while the timer is enabled.
+
+* **Status Register (STATUS)**
+  Indicates when a timeout event has occurred.
+
+When the timer is enabled, the counter loads the value from the LOAD register and begins counting down.
+When the counter reaches zero, a timeout event is generated.
+
+In periodic mode, the counter automatically reloads and continues running.
 
 ---
 
-## 4. Block Diagram (Conceptual)
+## 5. Block Diagram
+
+The conceptual block diagram of the Timer IP is shown below:
 
 ![Timer IP Block Diagram](Block_Diagram.png)
 
+This diagram illustrates the relationship between the bus interface, register file, counter logic, and timeout output.
+
 ---
 
-## 5. Operating Modes
+## 6. Operating Modes
 
-### 5.1 One-Shot Mode
+### 6.1 One-Shot Mode
 
 * Timer counts down once
-* Timeout is generated
-* Timer stops after reaching zero
+* Timeout flag is set when the counter reaches zero
+* Timer stops after timeout
+* Software must re-enable the timer for another cycle
 
-### 5.2 Periodic Mode
+### 6.2 Periodic Mode
 
-* Timer automatically reloads
-* Timeout is generated periodically
-* No software re-trigger required
+* Timer automatically reloads from the LOAD register
+* Timeout flag is set on every expiration
+* Timer continues running until disabled by software
 
 ---
 
-## 6. Timeout Signal Behavior
+## 7. Timeout and Status Behavior (IMPORTANT)
 
-* The `timeout` signal is asserted for **one clock cycle**
-* It is cleared automatically in hardware
-* Software can also observe timeout via the status register
+When the timer counter reaches zero:
+
+* The internal **timeout flag is set to `1`**
+* The timeout flag remains asserted (**sticky**) until cleared by software
+* Software clears the timeout flag by writing `1` to the STATUS register (W1C behavior)
 
 This design ensures:
 
-* Clean pulse generation
-* Safe hardware triggering
-* Easy waveform visibility during simulation
+* Reliable polling without missing timeout events
+* Compatibility with memory-mapped software programming models
+* Deterministic behavior in both one-shot and periodic modes
+
+The timeout flag is also exposed internally as a `timeout` signal, allowing it to drive hardware logic such as LED toggling.
 
 ---
 
-## 7. Clock and Reset Behavior
+## 8. Clock and Reset Behavior
 
-* Operates on the system clock (`clk`)
-* Active-low reset (`resetn`)
-* On reset:
+* The Timer IP operates on the system clock (`clk`)
+* Reset is **active-low** (`resetn`)
 
-  * Timer is disabled
-  * Counter is cleared
-  * Timeout is deasserted
+On reset:
 
----
+* Timer is disabled
+* Counter value is cleared
+* Timeout flag is deasserted
 
-## 8. Typical Use Cases
-
-* LED heartbeat blinking
-* Periodic polling in embedded software
-* Time delays without CPU busy-wait loops
-* Event triggering in hardware
+After reset, software must reprogram the LOAD and CTRL registers to start the timer.
 
 ---
 
-## 9. Validation Summary
+## 9. Typical Use Cases
 
-The Timer IP has been:
+Common use cases for the Timer IP include:
 
-* Verified using RTL simulation (GTKWave)
-* Tested on VSDSquadron FPGA hardware
-* Demonstrated driving both on-board and external LEDs
-
----
-
-## 10. Related Documents
-
-- [Integration Guide](Integration_Guide.md)  
-- [Register Map](Register_Map.md)  
-- [Example Usage](Example_Usage.md)  
+* LED heartbeat blinking on FPGA boards
+* Periodic software polling intervals
+* Delay generation without CPU busy loops
+* Hardware event triggering based on elapsed time
 
 ---
 
-## 11. Conclusion
+## 10. Validation Summary
 
-The Timer IP provides a reliable, reusable, and hardware-verified timing solution for VSDSquadron FPGA-based systems.
-It enables clean separation between software control and hardware execution.
+The Timer IP has been validated using:
+
+* RTL simulation with GTKWave
+* Register-level software testing
+* FPGA hardware testing on the VSDSquadron board
+* LED-based visual confirmation of timeout events
+
+Both simulation and hardware results confirm correct functionality.
 
 ---
+
+## 11. Known Limitations & Notes
+
+* No interrupt output is provided (polling-based operation only)
+* Single timer channel only
+* Timer resolution depends on system clock frequency
+* Assumes synchronous memory-mapped bus access
+
+These limitations are intentional to keep the IP lightweight and easy to integrate.
+
+---
+
+## 12. Related Documents
+
+* **Register_Map.md**
+* **Integration_Guide.md**
+* **Example_Usage.md**
+
+---
+
+## 13. Conclusion
+
+The Timer IP provides a clean, reliable, and hardware-verified timing solution for VSDSquadron-based systems.
+Its simple programming model and predictable behavior make it suitable for both learning and real-world FPGA SoC designs.
+
+---
+
