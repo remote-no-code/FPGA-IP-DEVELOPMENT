@@ -28,9 +28,7 @@ Before integration, ensure the following are available:
 Include the Timer IP RTL file in the build system:
 
 ```
-
 ip/timer_ip/rtl/timer_ip.v
-
 ````
 
 Ensure this file is included in both synthesis and simulation sources.
