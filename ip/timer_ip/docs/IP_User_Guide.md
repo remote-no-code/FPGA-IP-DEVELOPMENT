@@ -106,9 +106,9 @@ The Timer IP has been:
 
 ## 10. Related Documents
 
-* **Register_Map.md** – Detailed register definitions
-* **Integration_Guide.md** – SoC and RTL integration steps
-* **Example_Usage.md** – Example C code for timer usage
+- [Integration Guide](Integration_Guide.md)  
+- [Register Map](Register_Map.md)  
+- [Example Usage](Example_Usage.md)  
 
 ---
 
