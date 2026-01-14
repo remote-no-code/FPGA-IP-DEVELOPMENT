@@ -23,13 +23,13 @@ hardware-driven heartbeat indicators.
 ---
 
 ## Repository Structure
-
+```
 ip/timer_ip/
 ├── rtl/                # Timer IP RTL implementation
 ├── software/           # Example software
 ├── docs/               # Detailed documentation
 └── README.md           # This file
-
+```
 ## Documentation
 The complete documentation for this IP is available in the `docs/` directory:
 
@@ -71,4 +71,3 @@ The complete documentation for this IP is available in the `docs/` directory:
 ## License
 This IP is provided for educational and open-source use within the VSDSquadron FPGA
 ecosystem.
-```
