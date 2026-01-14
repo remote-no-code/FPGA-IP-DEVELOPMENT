@@ -51,7 +51,7 @@ The complete documentation for this IP is available in the `docs/` directory:
 
 ## Hardware Demonstration
 
-**https://github.com/user-attachments/assets/458be707-29d0-4556-9c63-b0ed57ddd98b**
+https://github.com/user-attachments/assets/458be707-29d0-4556-9c63-b0ed57ddd98b
 
 ---
 
