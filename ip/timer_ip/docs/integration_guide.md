@@ -1,79 +1,77 @@
+
 # Timer IP – Integration Guide
 
 ## 1. Purpose
+This document describes how to integrate the **Timer IP** into a
+VSDSquadron-based SoC. It covers RTL inclusion, address mapping,
+bus connections, and an example of hardware usage.
 
-This document describes how to **integrate the Timer IP into a VSDSquadron-based SoC**.
-It covers RTL instantiation, address mapping, bus connections, and LED hookup.
-
-This guide is intended for **SoC and FPGA system integrators**.
+This guide is intended for **SoC designers and FPGA system integrators**.
 
 ---
 
 ## 2. Prerequisites
-
 Before integration, ensure the following are available:
 
-* VSDSquadron SoC with RISC-V CPU
-* Memory-mapped bus signals:
-
-  * `mem_addr`
-  * `mem_wdata`
-  * `mem_wmask`
-  * `mem_rdata`
-* System clock (`clk`)
-* Active-low reset (`resetn`)
+- VSDSquadron SoC with a RISC-V CPU
+- System clock (`clk`)
+- Active-low reset (`resetn`)
+- Memory-mapped bus signals:
+  - `mem_addr`
+  - `mem_wdata`
+  - `mem_wmask`
+  - `mem_rdata`
 
 ---
 
 ## 3. RTL File Inclusion
-
-Add the Timer IP RTL file to your build system:
+Include the Timer IP RTL file in the build system:
 
 ```
+
 ip/timer_ip/rtl/timer_ip.v
-```
 
-Ensure it is included in synthesis and simulation sources.
+````
+
+Ensure this file is included in both synthesis and simulation sources.
 
 ---
 
 ## 4. Address Mapping
+Assign a free address range to the Timer IP in the SoC memory map.
 
-Choose a free address range for the Timer IP.
-
-### Recommended Mapping
-
+### Recommended Base Address
 ```verilog
 localparam TIMER_BASE = 32'h2000_1000;
-```
+````
 
-Address decode condition:
+### Address Decode
 
 ```verilog
 wire is_timer = (mem_addr[31:12] == TIMER_BASE[31:12]);
 ```
 
-This provides a 4 KB address window for the Timer IP.
+This allocates a 4 KB address window for the Timer IP.
 
 ---
 
 ## 5. Timer IP Instantiation
 
-Instantiate the Timer IP in the SoC top module:
+Instantiate the Timer IP in the SoC top-level module:
 
 ```verilog
 wire [31:0] timer_rdata;
 wire        timer_timeout;
 
 timer_ip TIMER (
-    .clk        (clk),
-    .resetn     (resetn),
-    .addr       (mem_addr),
-    .wdata      (mem_wdata),
-    .we         (is_timer & |mem_wmask),
-    .sel        (is_timer),
-    .rdata      (timer_rdata),
-    .timeout    (timer_timeout)
+    .clk     (clk),
+    .resetn  (resetn),
+    .sel     (is_timer),
+    .we      (is_timer & |mem_wmask),
+    .addr    (mem_addr),
+    .wdata   (mem_wdata),
+    .rdata   (timer_rdata),
+    .timeout (timer_timeout)
 );
 ```
 
@@ -81,7 +79,7 @@ timer_ip TIMER (
 
 ## 6. Read Data Multiplexing
 
-Add the Timer IP to the SoC read-data mux:
+Add the Timer IP to the SoC read-data multiplexer:
 
 ```verilog
 assign mem_rdata =
@@ -91,13 +89,14 @@ assign mem_rdata =
     32'b0;
 ```
 
-This ensures CPU reads from the correct peripheral.
+This ensures the CPU reads data from the correct peripheral.
 
 ---
 
-## 7. LED Connection Example
+## 7. Example Hardware Usage
 
-The Timer IP generates a `timeout` pulse that can drive hardware logic.
+The Timer IP asserts the `timeout` signal when the countdown expires.
+This signal can be used to drive hardware logic.
 
 ### Example: LED Toggle Logic
 
@@ -111,11 +110,11 @@ always @(posedge clk or negedge resetn) begin
         led_toggle <= ~led_toggle;
 end
 
-assign LED_EXT = led_toggle;        // external LED (active-HIGH)
-assign LEDS    = {5{~led_toggle}};  // onboard LEDs (active-LOW)
+assign LED_EXT = led_toggle;        // External LED (active-HIGH)
+assign LEDS    = {5{~led_toggle}};  // On-board LEDs (active-LOW)
 ```
 
-This logic demonstrates **hardware-driven behavior**, independent of CPU loops.
+This demonstrates **hardware-driven behavior**, independent of software delay loops.
 
 ---
 
@@ -124,23 +123,22 @@ This logic demonstrates **hardware-driven behavior**, independent of CPU loops.
 On reset:
 
 * Timer is disabled
-* Counter is cleared
-* Timeout signal is deasserted
-* LEDs are turned OFF
+* Counter value is cleared
+* Timeout flag is deasserted
 
-Ensure reset polarity matches system conventions.
+Ensure reset polarity matches the system reset convention.
 
 ---
 
-## 9. Timing & Clocking Notes
+## 9. Timing and Clocking Notes
 
-* Timer operates on system clock
-* Countdown rate = 1 decrement per clock cycle
+* Timer operates on the system clock
+* Countdown rate is one decrement per clock cycle
 * Timer resolution depends on clock frequency
 
 Example:
 
-* 12 MHz clock → 12 million ticks per second
+* 12 MHz clock → 12 million timer ticks per second
 
 ---
 
@@ -149,28 +147,27 @@ Example:
 After integration:
 
 * Run RTL simulation
-* Verify register access
-* Confirm timeout generation
-* Validate LED toggling
-* Program FPGA and observe hardware behavior
+* Verify register read/write access
+* Confirm timeout assertion
+* Validate hardware behavior
+* Program FPGA and observe expected output
 
 ---
 
 ## 11. Common Integration Errors
 
-| Issue                 | Cause                    |
-| --------------------- | ------------------------ |
-| Timer not responding  | Incorrect address decode |
-| Timeout never asserts | Timer not enabled        |
-| LED stuck             | Missing toggle logic     |
-| Read returns zero     | Read mux not updated     |
+| Issue                 | Possible Cause            |
+| --------------------- | ------------------------- |
+| Timer not responding  | Incorrect address decode  |
+| Timeout never asserts | Timer not enabled         |
+| LED stuck ON/OFF      | Missing toggle logic      |
+| Read returns zero     | Read-data mux not updated |
 
 ---
 
 ## 12. Related Documents
 
-* **Register_Map.md**
 * **IP_User_Guide.md**
+* **Register_Map.md**
 * **Example_Usage.md**
 
----
