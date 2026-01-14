@@ -140,7 +140,8 @@ Failure to clear the flag may prevent detection of subsequent timeouts.
 
 ## 10. Related Documents
 
-* **IP_User_Guide.md**
-* **Register_Map.md**
-* **Integration_Guide.md**
+- [IP User Guide](IP_User_Guide.md)  
+- [Register Map](Register_Map.md)  
+- [Integration Guide](Integration_Guide.md)  
+
 
