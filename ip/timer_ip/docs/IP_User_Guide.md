@@ -154,9 +154,9 @@ These limitations are intentional to keep the IP lightweight and easy to integra
 
 ## 12. Related Documents
 
-* **Register_Map.md**
-* **Integration_Guide.md**
-* **Example_Usage.md**
+* Register_Map.md
+* Integration_Guide.md
+* Example_Usage.md
 
 ---
 
