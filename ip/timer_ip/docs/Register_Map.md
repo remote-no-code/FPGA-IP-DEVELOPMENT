@@ -1,172 +1,174 @@
-# Timer IP – Register Map
+Here is the **fully rewritten, corrected, and commercially compliant** version of **`IP_User_Guide.md`**, aligned with your RTL, register map, and software model.
 
-## 1. Overview
-
-The Timer IP is accessed through a **memory-mapped register interface**.
-All registers are **32-bit wide** and aligned on 4-byte boundaries.
-
-The base address of the Timer IP is configurable during SoC integration.
-
-> **Example Base Address:** `0x2000_1000`
+You can **replace your entire file** with the content below.
 
 ---
 
-## 2. Register Summary
+# Timer IP – User Guide
 
-| Offset | Register Name | Access | Description              |
-| ------ | ------------- | ------ | ------------------------ |
-| 0x00   | TIMER_CTRL    | R/W    | Timer control register   |
-| 0x04   | TIMER_LOAD    | R/W    | Load value for countdown |
-| 0x08   | TIMER_VALUE   | R      | Current counter value    |
-| 0x0C   | TIMER_STAT    | R/W    | Timer status register    |
+## 1. Introduction
 
----
+The Timer IP is a **memory-mapped hardware timer peripheral** designed for the **VSDSquadron FPGA platform**.
+It allows software running on a RISC-V processor to perform accurate time-based operations **without using software delay loops**.
 
-## 3. Register Descriptions
+Once configured, the Timer IP operates **autonomously in hardware**, generating timeout events that can be observed by software or used directly by hardware logic such as LEDs or control signals.
 
 ---
 
-### 3.1 TIMER_CTRL (Offset: `0x00`)
+## 2. Purpose of the IP
 
-**Purpose:**
-Controls timer enable and operating mode.
+The Timer IP provides a programmable countdown timer that can be used for:
 
-**Access:** Read / Write
-**Reset Value:** `0x00000000`
+* Periodic heartbeat generation
+* Time delays and polling intervals
+* Hardware-driven LED blinking
+* Event triggering without CPU busy-wait loops
 
-#### Bit Definition
-
-| Bit  | Name | Description                              |
-| ---- | ---- | ---------------------------------------- |
-| 0    | EN   | Timer enable (1 = enable, 0 = disable)   |
-| 1    | MODE | Mode select (0 = one-shot, 1 = periodic) |
-| 31:2 | –    | Reserved (write as 0)                    |
-
-#### Example
-
-```c
-// Enable timer in periodic mode
-TIMER_CTRL = 0x3;
-```
+This IP is intended to be **simple, reliable, and reusable** across VSDSquadron-based SoCs.
 
 ---
 
-### 3.2 TIMER_LOAD (Offset: `0x04`)
+## 3. Key Features
 
-**Purpose:**
-Specifies the countdown start value.
-
-**Access:** Read / Write
-**Reset Value:** `0x00000000`
-
-#### Bit Definition
-
-| Bit  | Description          |
-| ---- | -------------------- |
-| 31:0 | Countdown load value |
-
-When the timer is enabled, this value is loaded into the counter.
-
-#### Example
-
-```c
-// Set timer interval
-TIMER_LOAD = 6000000;
-```
+* 32-bit programmable countdown timer
+* Memory-mapped register interface
+* Software-controlled enable and mode selection
+* One-shot and periodic (auto-reload) modes
+* Sticky timeout flag with write-one-to-clear (W1C) behavior
+* Hardware timeout signal for external logic
+* Verified using RTL simulation and FPGA hardware
 
 ---
 
-### 3.3 TIMER_VALUE (Offset: `0x08`)
+## 4. Functional Overview
 
-**Purpose:**
-Provides the current countdown value.
+The Timer IP consists of the following logical components:
 
-**Access:** Read-Only
-**Reset Value:** `0x00000000`
+* **Control Register (CTRL)**
+  Enables the timer and selects one-shot or periodic mode.
 
-#### Bit Definition
+* **Load Register (LOAD)**
+  Holds the initial countdown value programmed by software.
 
-| Bit  | Description           |
-| ---- | --------------------- |
-| 31:0 | Current counter value |
+* **Counter Register (VALUE)**
+  Decrements on every clock cycle while the timer is enabled.
 
-This register decrements on each clock cycle when the timer is enabled.
+* **Status Register (STATUS)**
+  Indicates when a timeout event has occurred.
 
-#### Example
+When the timer is enabled, the counter loads the value from the LOAD register and begins counting down.
+When the counter reaches zero, a timeout event is generated.
 
-```c
-unsigned int current = TIMER_VALUE;
-```
-
----
-
-### 3.4 TIMER_STAT (Offset: `0x0C`)
-
-**Purpose:**
-Indicates timeout status and allows software to clear the timeout flag.
-
-**Access:** Read / Write
-**Reset Value:** `0x00000000`
-
-#### Bit Definition
-
-| Bit  | Name    | Description               |
-| ---- | ------- | ------------------------- |
-| 0    | TIMEOUT | Set to 1 on timeout event |
-| 31:1 | –       | Reserved                  |
-
-* Writing `1` clears the timeout flag
-* Writing `0` has no effect
-
-#### Example
-
-```c
-// Clear timeout flag
-TIMER_STAT = 1;
-```
+In periodic mode, the counter automatically reloads and continues running.
 
 ---
 
-## 4. Register Access Notes
+## 5. Block Diagram
 
-* All registers are **synchronous to the system clock**
-* Reserved bits must be written as zero
-* Reading undefined bits returns zero
-* Timeout flag is also reflected via internal `timeout` signal
+The conceptual block diagram of the Timer IP is shown below:
 
----
+![Timer IP Block Diagram](Block_Diagram.png)
 
-## 5. Typical Register Programming Sequence
-
-```c
-TIMER_LOAD = interval;
-TIMER_CTRL = 0x3;   // enable + periodic
-
-while (!(TIMER_STAT & 1));
-// timeout occurred
-
-TIMER_STAT = 1;     // clear flag
-```
+This diagram illustrates the relationship between the bus interface, register file, counter logic, and timeout output.
 
 ---
 
-## 6. Address Calculation Example
+## 6. Operating Modes
 
-If base address = `0x20001000`:
+### 6.1 One-Shot Mode
 
-| Register    | Address      |
-| ----------- | ------------ |
-| TIMER_CTRL  | `0x20001000` |
-| TIMER_LOAD  | `0x20001004` |
-| TIMER_VALUE | `0x20001008` |
-| TIMER_STAT  | `0x2000100C` |
+* Timer counts down once
+* Timeout flag is set when the counter reaches zero
+* Timer stops after timeout
+* Software must re-enable the timer for another cycle
+
+### 6.2 Periodic Mode
+
+* Timer automatically reloads from the LOAD register
+* Timeout flag is set on every expiration
+* Timer continues running until disabled by software
 
 ---
 
-## 7. Related Documents
+## 7. Timeout and Status Behavior (IMPORTANT)
 
-* **IP_User_Guide.md**
+When the timer counter reaches zero:
+
+* The internal **timeout flag is set to `1`**
+* The timeout flag remains asserted (**sticky**) until cleared by software
+* Software clears the timeout flag by writing `1` to the STATUS register (W1C behavior)
+
+This design ensures:
+
+* Reliable polling without missing timeout events
+* Compatibility with memory-mapped software programming models
+* Deterministic behavior in both one-shot and periodic modes
+
+The timeout flag is also exposed internally as a `timeout` signal, allowing it to drive hardware logic such as LED toggling.
+
+---
+
+## 8. Clock and Reset Behavior
+
+* The Timer IP operates on the system clock (`clk`)
+* Reset is **active-low** (`resetn`)
+
+On reset:
+
+* Timer is disabled
+* Counter value is cleared
+* Timeout flag is deasserted
+
+After reset, software must reprogram the LOAD and CTRL registers to start the timer.
+
+---
+
+## 9. Typical Use Cases
+
+Common use cases for the Timer IP include:
+
+* LED heartbeat blinking on FPGA boards
+* Periodic software polling intervals
+* Delay generation without CPU busy loops
+* Hardware event triggering based on elapsed time
+
+---
+
+## 10. Validation Summary
+
+The Timer IP has been validated using:
+
+* RTL simulation with GTKWave
+* Register-level software testing
+* FPGA hardware testing on the VSDSquadron board
+* LED-based visual confirmation of timeout events
+
+Both simulation and hardware results confirm correct functionality.
+
+---
+
+## 11. Known Limitations & Notes
+
+* No interrupt output is provided (polling-based operation only)
+* Single timer channel only
+* Timer resolution depends on system clock frequency
+* Assumes synchronous memory-mapped bus access
+
+These limitations are intentional to keep the IP lightweight and easy to integrate.
+
+---
+
+## 12. Related Documents
+
+* **Register_Map.md**
 * **Integration_Guide.md**
 * **Example_Usage.md**
+
+---
+
+## 13. Conclusion
+
+The Timer IP provides a clean, reliable, and hardware-verified timing solution for VSDSquadron-based systems.
+Its simple programming model and predictable behavior make it suitable for both learning and real-world FPGA SoC designs.
 
 ---
