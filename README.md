@@ -1,10 +1,9 @@
 # FPGA-IP-DEVELOPMENT
 
-This repository documents the work completed as part of the **VSD RISC-V FPGA IP Development Program**, covering **Task-1**, **Task-2**, and **Task-3**.
+This repository documents the work completed as part of the **VSD RISC-V FPGA IP Development Program**, covering **Task-1**, **Task-2**, **Task-3**, and **Task-4**.
 
 All development and validation were performed using **GitHub Codespaces (Linux)**.
 FPGA hardware validation was completed using the VSDSquadron board.
-
 
 ***
 
@@ -61,6 +60,28 @@ This task strengthened understanding of **memory-mapped I/O**, **register-level 
 
 ***
 
+## Task-4: Timer IP Development and Hardware Validation
+
+In Task-4, a **programmable Timer IP** was designed and integrated as a real peripheral into the RISC-V SoC.
+
+- A **memory-mapped Timer IP** was implemented with a well-defined register interface:
+  - `TIMER_CTRL` for enable and mode control
+  - `TIMER_LOAD` for countdown initialization
+  - `TIMER_VALUE` for current count readback
+  - `TIMER_STAT` for sticky timeout status (W1C)
+- One-shot and periodic operating modes were supported
+- Proper **register decoding and counter logic** were implemented
+- The Timer IP was integrated into the SoC address map
+- Firmware was written to configure and control the timer via polling
+- End-to-end validation was completed:
+  - **RTL simulation** using GTKWave
+  - **FPGA hardware validation** using the VSDSquadron board
+- Timer-generated timeout events were used to drive **hardware LED toggling**, demonstrating true hardware-timed behavior independent of software delay loops
+
+This task validated the complete workflow of **IP design, documentation, software control, and real FPGA hardware verification**.
+
+***
+
 ## Status
 
 - ✅ RISC-V toolchain verified
@@ -68,7 +89,7 @@ This task strengthened understanding of **memory-mapped I/O**, **register-level 
 - ✅ VSDFPGA firmware build working
 - ✅ Memory-mapped GPIO IP integrated
 - ✅ Multi-register GPIO IP validated in simulation and hardware
-
+- ✅ Timer IP integrated and validated in simulation and FPGA hardware
 
 ***
 
