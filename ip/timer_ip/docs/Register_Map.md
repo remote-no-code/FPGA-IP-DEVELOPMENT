@@ -164,8 +164,8 @@ TIMER_STAT = 0x1;   // Clear timeout flag
 
 ## 7. Related Documents
 
-[Example Usage](Example_Usage.md)
-[IP User GUide](IP_User_Guide.md)
-[Integration Guide](Integration_Guide.md)
+-[Example Usage](Example_Usage.md)
+-[IP User GUide](IP_User_Guide.md)
+-[Integration Guide](Integration_Guide.md)
 
 ---
