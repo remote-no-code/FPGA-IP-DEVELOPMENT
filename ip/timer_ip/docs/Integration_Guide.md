@@ -165,7 +165,7 @@ After integration:
 
 ## 12. Related Documents
 
-* **IP_User_Guide.md**
-* **Register_Map.md**
-* **Example_Usage.md**
+- [IP User Guide](IP_User_Guide.md)  
+- [Register Map](Register_Map.md)  
+- [Example Usage](Example_Usage.md)  
 
