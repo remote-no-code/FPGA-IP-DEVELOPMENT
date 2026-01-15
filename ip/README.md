@@ -68,7 +68,7 @@ The following screenshots were captured for submission:
    ![LED Toggle](./snapshots/led_toggle.png)
 
 5. Combined view showing full data path
-    ![End-to-End View](Task4/snapshots/end_view.png)
+    ![End-to-End View](../Task4/snapshots/end_view.png)
 
 
 https://github.com/user-attachments/assets/458be707-29d0-4556-9c63-b0ed57ddd98b
