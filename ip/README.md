@@ -12,6 +12,13 @@ hardware-driven heartbeat indicators.
 
 ---
 
+## Block Diagram
+The conceptual block diagram of the Timer IP is shown below:
+
+![Timer IP Block Diagram](timer_ip/docs/Block_Diagram.png)
+
+This diagram illustrates the relationship between the bus interface, register file, counter logic, and timeout output.
+
 ## Features
 - 32-bit programmable countdown timer  
 - Memory-mapped register interface  
