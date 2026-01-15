@@ -56,16 +56,16 @@ The complete documentation for this IP is available in the `docs/` directory:
 The following screenshots were captured for submission:
 
 1. CPU writing to Timer registers
-   ![CPU to Timer Write](./snapshots/cpu_to_timer.png)
+   ![CPU to Timer Write](../Task4/snapshots/cpu_to_timer.png)
 
 2. Timer countdown (`value_reg` changing)
-   ![Timer Countdown](./snapshots/timer_countdown.png)
+   ![Timer Countdown](../Task4/snapshots/timer_countdown.png)
 
 3. Timeout pulse assertion
-   ![Timeout Pulse](./snapshots/timeout_pulse.png)
+   ![Timeout Pulse](../Task4/snapshots/timeout_pulse.png)
 
 4. LED toggle driven by timeout
-   ![LED Toggle](./snapshots/led_toggle.png)
+   ![LED Toggle](../Task4/snapshots/led_toggle.png)
 
 5. Combined view showing full data path
     ![End-to-End View](../Task4/snapshots/end_view.png)
