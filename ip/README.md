@@ -51,6 +51,26 @@ The complete documentation for this IP is available in the `docs/` directory:
 
 ## Hardware Demonstration
 
+### Simulation Screenshots
+
+The following screenshots were captured for submission:
+
+1. CPU writing to Timer registers
+   ![CPU to Timer Write](./snapshots/cpu_to_timer.png)
+
+2. Timer countdown (`value_reg` changing)
+   ![Timer Countdown](./snapshots/timer_countdown.png)
+
+3. Timeout pulse assertion
+   ![Timeout Pulse](./snapshots/timeout_pulse.png)
+
+4. LED toggle driven by timeout
+   ![LED Toggle](./snapshots/led_toggle.png)
+
+5. Combined view showing full data path
+    ![End-to-End View](./snapshots/end_view.png)
+
+
 https://github.com/user-attachments/assets/458be707-29d0-4556-9c63-b0ed57ddd98b
 
 ---
