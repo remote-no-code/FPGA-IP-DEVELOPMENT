@@ -345,7 +345,7 @@ endmodule
 module SOC (
     input            CLK,
     input            RESET,
-    output reg       LEDS,      // onboard LEDs (active-LOW)
+    output reg       LEDS,      // onboard LED (active-LOW)
     output reg       LED_EXT,   // external LED (pin 46)
     input            RXD,
     output           TXD
@@ -403,7 +403,7 @@ module SOC (
     );
 
     // ============================================================
-    // Address Decode (TASK-4 FIX)
+    // Address Decode
     // ============================================================
     localparam UART_BASE  = 32'h4000_0000;
     localparam GPIO_BASE  = 32'h2000_0000;
@@ -447,20 +447,27 @@ module SOC (
     );
 
     // ============================================================
-    // TIMER IP (CORE OF TASK-4)
+    // TIMER IP (FIXED)
     // ============================================================
     wire [31:0] timer_rdata;
     wire        timer_timeout;
 
+    wire timer_sel = is_timer;
+    wire timer_we  = is_timer & |mem_wmask;
+    wire timer_re  = is_timer & mem_rstrb;
+
     timer_ip TIMER (
-        .clk     (clk),
-        .resetn  (resetn),
-        .sel     (is_timer),
-        .we      (is_timer & |mem_wmask),
-        .addr    (mem_addr),
-        .wdata   (mem_wdata),
-        .rdata   (timer_rdata),
-        .timeout (timer_timeout)
+        .clk       (clk),
+        .resetn    (resetn),
+
+        .sel       (timer_sel),
+        .wr_en     (timer_we),
+        .rd_en     (timer_re),
+        .addr      (mem_addr[3:2]),   // word offset
+        .wdata     (mem_wdata),
+        .rdata     (timer_rdata),
+
+        .timeout_o (timer_timeout)
     );
 
     // ============================================================
@@ -483,7 +490,7 @@ module SOC (
     );
 
     // ============================================================
-    // Read Data Mux (TASK-4 FIX)
+    // Read Data Mux
     // ============================================================
     assign mem_rdata =
         is_ram   ? ram_rdata   :
@@ -492,36 +499,39 @@ module SOC (
         32'b0;
 
     // ============================================================
-	// TIMER → LED DEMO (REQUIRED)
-	// ============================================================
-	reg led_toggle;
+    // TIMER → LED DEMO (EDGE-BASED, FIXED)
+    // ============================================================
+    reg led_toggle;
+    reg timeout_d;
 
-	// Toggle on timer timeout
-	always @(posedge clk or negedge resetn) begin
-		if (!resetn)
-		    led_toggle <= 1'b0;
-		else if (timer_timeout)
-		    led_toggle <= ~led_toggle;
-	end
+    always @(posedge clk or negedge resetn) begin
+        if (!resetn) begin
+            led_toggle <= 1'b0;
+            timeout_d  <= 1'b0;
+        end else begin
+            timeout_d <= timer_timeout;
 
-	// Onboard LEDs (active-LOW, pin 39 used via LEDS[0])
-	always @(posedge clk or negedge resetn) begin
-		if (!resetn)
-		    LEDS <= 1'b1;              // all OFF
-		else
-		    LEDS <= ~led_toggle;      // mirror toggle
-	end
+            // toggle ONLY on rising edge of timeout
+            if (timer_timeout & ~timeout_d)
+                led_toggle <= ~led_toggle;
+        end
+    end
 
-	// External LED (active-HIGH, pin 46)
-	always @(posedge clk or negedge resetn) begin
-		if (!resetn)
-		    LED_EXT <= 1'b0;
-		else
-		    LED_EXT <= led_toggle;
-	end
+    // Onboard LED (active-LOW)
+    always @(posedge clk or negedge resetn) begin
+        if (!resetn)
+            LEDS <= 1'b1;
+        else
+            LEDS <= ~led_toggle;
+    end
 
+    // External LED (active-HIGH)
+    always @(posedge clk or negedge resetn) begin
+        if (!resetn)
+            LED_EXT <= 1'b0;
+        else
+            LED_EXT <= led_toggle;
+    end
 
 endmodule
-
-
 
